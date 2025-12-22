@@ -39,6 +39,14 @@ YusrilNet adalah sistem manajemen voucher WiFi berbasis web yang dibangun dengan
 - Password management
 - Proteksi hapus diri sendiri
 
+### 🌍 Public Interface
+- **Homepage Modern** - Landing page dengan daftar paket
+- **Pembelian Voucher** - Form checkout yang user-friendly
+- **Payment Gateway** - Integrasi iPaymu untuk pembayaran
+- **Email Notification** - Voucher otomatis dikirim ke email
+- **Responsive Design** - Optimal di semua perangkat
+
+
 ## 📸 Screenshots
 
 ### Dashboard Admin
@@ -60,6 +68,21 @@ YusrilNet adalah sistem manajemen voucher WiFi berbasis web yang dibangun dengan
 ### Manajemen Users
 ![Users](screenshots/users.png)
 *Kelola pengguna sistem*
+
+## 🌐 User Interface (Public)
+
+### Homepage
+![Homepage](screenshots/homepage.png)
+*Halaman utama dengan daftar paket voucher WiFi*
+
+### Form Pembelian
+![Checkout](screenshots/checkout.png)
+*Form pembelian voucher dengan integrasi payment gateway*
+
+### Halaman Sukses
+![Success](screenshots/success.png)
+*Halaman konfirmasi pembelian dengan kode voucher*
+
 
 ## 🚀 Teknologi
 
