@@ -70,7 +70,9 @@ class PublicOrderController extends Controller
         }
         $va        = config('services.ipaymu.va');
         $apiKey    = config('services.ipaymu.api_key');
-        $ipaymuUrl = config('services.ipaymu.url');
+
+        $baseUrl   = config('services.ipaymu.base_url'); // Ambil Base URL
+        $ipaymuUrl = $baseUrl . '/payment'; // Tambahkan endpoint payment
         $body = [
             'product'     => [$paket->nama], 'qty'         => [1], 'price'       => [$paket->price],
             'returnUrl'   => route('public.order.return'), // <-- UBAH KE ROUTE BARU
@@ -84,15 +86,23 @@ class PublicOrderController extends Controller
         $stringToSign = 'POST:' . $va . ':' . $requestBody . ':' . $apiKey;
         $signature    = hash_hmac('sha256', $stringToSign, $apiKey);
         $timestamp    = Date('YmdHis');
-        $response = Http::withHeaders([
+        $http = Http::withHeaders([
             'Content-Type' => 'application/json', 'signature'    => $signature,
             'va'           => $va, 'timestamp'    => $timestamp,
-        ])->post($ipaymuUrl, $body);
+        ]);
+        
+        // Hanya bypass SSL di local environment
+        if (app()->isLocal()) {
+            $http->withoutVerifying();
+        }
+
+        $response = $http->post($ipaymuUrl, $body);
         $result = $response->json();
-        if ($response->successful() && $result['Status'] == 200) {
+        
+        if ($response->successful() && isset($result['Status']) && $result['Status'] == 200) {
             return redirect()->away($result['Data']['Url']);
         } else {
-            Log::error('iPaymu Payment URL Error: ', $result);
+            Log::error('iPaymu Payment URL Error: ', $result ?? []);
             return back()->with('error', 'Gagal terhubung dengan gateway pembayaran.');
         }
     }
@@ -157,6 +167,8 @@ class PublicOrderController extends Controller
     {
         $va        = config('services.ipaymu.va');
         $apiKey    = config('services.ipaymu.api_key');
+        $baseUrl   = config('services.ipaymu.base_url');
+        $url       = $baseUrl . '/transaction'; // Tambahkan endpoint transaction
 
         $body = ['transactionId' => $transactionId];
         $jsonBody     = json_encode($body, JSON_UNESCAPED_SLASHES);
@@ -165,16 +177,23 @@ class PublicOrderController extends Controller
         $signature    = hash_hmac('sha256', $stringToSign, $apiKey);
         $timestamp    = Date('YmdHis');
 
-        $response = Http::withHeaders([
+
+        $http = Http::withHeaders([
             'Content-Type' => 'application/json', 'signature'    => $signature,
             'va'           => $va, 'timestamp'    => $timestamp,
-        ])->post('https://sandbox.ipaymu.com/api/v2/transaction', $body); // URL untuk cek transaksi
+        ]);
+
+        if (app()->isLocal()) {
+            $http->withoutVerifying();
+        }
+
+        $response = $http->post($url, $body); // Gunakan URL dinamis
 
         if ($response->successful() && $response->json()['Status'] == 200) {
             return $response->json()['Data'];
         }
 
-        Log::error('iPaymu Check Status Error: ', $response->json());
+        Log::error('iPaymu Check Status Error: ', $response->json() ?? []);
         return null;
     }
 
