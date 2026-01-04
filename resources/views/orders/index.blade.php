@@ -8,6 +8,37 @@
                 </h1>
                 <p class="text-muted mb-0 small">Kelola transaksi pelanggan</p>
             </div>
+            <div class="dropdown">
+                <button class="btn btn-danger btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                    <i class="fas fa-trash me-1"></i>Hapus Massal
+                </button>
+                <ul class="dropdown-menu">
+                    <li>
+                        <button type="button" class="dropdown-item text-danger" onclick="submitBulkDelete()">
+                            <i class="fas fa-check-square me-2"></i>Hapus Terpilih
+                        </button>
+                    </li>
+                    <li>
+                        <form action="{{ route('admin.orders.destroyByFilter', request()->all()) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus order sesuai filter saat ini?')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="dropdown-item">
+                                <i class="fas fa-filter me-2"></i>Hapus Sesuai Filter
+                            </button>
+                        </form>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <form action="{{ route('admin.orders.deleteAll') }}" method="POST" onsubmit="return confirm('PERINGATAN: Semua order akan dihapus! Yakin?')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="dropdown-item text-danger">
+                                <i class="fas fa-exclamation-triangle me-2"></i>Hapus SEMUA Data
+                            </button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
         </div>
 
         <!-- Stats -->
@@ -107,6 +138,9 @@
                         <table class="table table-hover mb-0">
                             <thead style="background: #f8f9fa;">
                                 <tr>
+                                    <th class="border-0 px-4 py-3" style="width: 40px;">
+                                        <input type="checkbox" id="selectAll" class="form-check-input">
+                                    </th>
                                     <th class="border-0 px-4 py-3">ID</th>
                                     <th class="border-0 px-4 py-3">Pelanggan</th>
                                     <th class="border-0 px-4 py-3">Paket</th>
@@ -119,6 +153,9 @@
                             <tbody>
                                 @foreach($orders as $order)
                                     <tr>
+                                        <td class="px-4 py-3">
+                                            <input type="checkbox" name="order_ids[]" value="{{ $order->id }}" class="form-check-input order-checkbox">
+                                        </td>
                                         <td class="px-4 py-3">#{{ $order->id }}</td>
                                         <td class="px-4 py-3">
                                             <div>
@@ -214,4 +251,69 @@
             padding: 0.375rem 0.75rem;
         }
     </style>
+    </style>
 </x-app-layout>
+
+<form id="bulkDeleteForm" action="{{ route('admin.orders.destroySelected') }}" method="POST" style="display: none;">
+    @csrf
+    @method('DELETE')
+    <input type="hidden" name="order_ids" id="bulkDeleteInput">
+</form>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const selectAll = document.getElementById('selectAll');
+        const checkboxes = document.querySelectorAll('.order-checkbox');
+
+        // Handle Select All
+        if(selectAll) {
+            selectAll.addEventListener('change', function() {
+                checkboxes.forEach(cb => {
+                    cb.checked = this.checked;
+                });
+            });
+        }
+
+        // Handle individual checkbox change to update Select All state
+        checkboxes.forEach(cb => {
+            cb.addEventListener('change', function() {
+                if (!this.checked) {
+                    selectAll.checked = false;
+                } else {
+                    const allChecked = Array.from(checkboxes).every(c => c.checked);
+                    if (allChecked) selectAll.checked = true;
+                }
+            });
+        });
+    });
+
+    function submitBulkDelete() {
+        // Collect checked IDs
+        const checkboxes = document.querySelectorAll('.order-checkbox:checked');
+        if (checkboxes.length === 0) {
+            alert('Pilih setidaknya satu order untuk dihapus.');
+            return;
+        }
+
+        if (!confirm('Yakin ingin menghapus ' + checkboxes.length + ' order terpilih?')) {
+            return;
+        }
+
+        const ids = Array.from(checkboxes).map(cb => cb.value);
+        
+        // Prepare hidden form
+        const form = document.getElementById('bulkDeleteForm');
+        // Remove existing dynamic inputs
+        form.querySelectorAll('input[name="order_ids[]"]').forEach(el => el.remove());
+
+        ids.forEach(id => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'order_ids[]';
+            input.value = id;
+            form.appendChild(input);
+        });
+
+        form.submit();
+    }
+</script>

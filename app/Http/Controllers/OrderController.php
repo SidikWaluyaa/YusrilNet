@@ -132,6 +132,52 @@ class OrderController extends Controller
         return redirect()->route('admin.orders.index')->with('success', 'Semua data order berhasil dihapus dan ID telah direset.');
     }
 
+    public function destroySelected(Request $request)
+    {
+        $request->validate([
+            'order_ids' => 'required|array',
+            'order_ids.*' => 'exists:orders,id'
+        ]);
+
+        try {
+            $deletedCount = Order::whereIn('id', $request->order_ids)->delete();
+            return redirect()->route('admin.orders.index')->with('success', "Berhasil menghapus {$deletedCount} order");
+        } catch (\Exception $e) {
+            return redirect()->route('admin.orders.index')->with('error', 'Gagal menghapus order: ' . $e->getMessage());
+        }
+    }
+
+    public function destroyByFilter(Request $request)
+    {
+        try {
+            $query = Order::query();
+
+            // Apply filters sama seperti di printPdf
+            if ($request->filled('paket_id')) {
+                $query->where('paket_id', $request->paket_id);
+            }
+
+            if ($request->filled('tanggal_mulai') && $request->filled('tanggal_akhir')) {
+                $query->whereBetween('created_at', [
+                    $request->tanggal_mulai . ' 00:00:00',
+                    $request->tanggal_akhir . ' 23:59:59',
+                ]);
+            }
+
+            $deletedCount = $query->count();
+
+            if ($deletedCount == 0) {
+                return redirect()->route('admin.orders.index')->with('warning', 'Tidak ada order yang sesuai dengan filter untuk dihapus');
+            }
+
+            $query->delete();
+            return redirect()->route('admin.orders.index')->with('success', "Berhasil menghapus {$deletedCount} order sesuai filter");
+
+        } catch (\Exception $e) {
+            return redirect()->route('admin.orders.index')->with('error', 'Gagal menghapus order: ' . $e->getMessage());
+        }
+    }
+
     public function printPdf(Request $request)
     {
 

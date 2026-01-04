@@ -9,6 +9,37 @@
                 <p class="text-muted mb-0 small">Kelola voucher WiFi</p>
             </div>
             <div class="d-flex gap-2 flex-wrap">
+                <div class="dropdown">
+                    <button class="btn btn-danger btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-trash me-1"></i>Hapus Massal
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <button type="button" class="dropdown-item text-danger" onclick="submitBulkDelete()">
+                                <i class="fas fa-check-square me-2"></i>Hapus Terpilih
+                            </button>
+                        </li>
+                        <li>
+                            <form action="{{ route('admin.vouchers.destroyByFilter', request()->all()) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus voucher sesuai filter saat ini?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="dropdown-item">
+                                    <i class="fas fa-filter me-2"></i>Hapus Sesuai Filter
+                                </button>
+                            </form>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form action="{{ route('admin.vouchers.destroyAll') }}" method="POST" onsubmit="return confirm('PERINGATAN: Semua voucher akan dihapus! Yakin?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="dropdown-item text-danger">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>Hapus SEMUA Data
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
                 <a href="{{ route('admin.vouchers.create') }}" class="btn btn-primary btn-sm">
                     <i class="fas fa-plus me-1"></i>Tambah
                 </a>
@@ -81,6 +112,9 @@
                         <table class="table table-hover mb-0">
                             <thead style="background: #f8f9fa;">
                                 <tr>
+                                    <th class="border-0 px-4 py-3" style="width: 40px;">
+                                        <input type="checkbox" id="selectAll" class="form-check-input">
+                                    </th>
                                     <th class="border-0 px-4 py-3">ID</th>
                                     <th class="border-0 px-4 py-3">Paket</th>
                                     <th class="border-0 px-4 py-3">Username</th>
@@ -95,6 +129,9 @@
                             <tbody>
                                 @foreach($vouchers as $voucher)
                                     <tr>
+                                        <td class="px-4 py-3">
+                                            <input type="checkbox" name="voucher_ids[]" value="{{ $voucher->id }}" class="form-check-input voucher-checkbox">
+                                        </td>
                                         <td class="px-4 py-3">{{ $voucher->id }}</td>
                                         <td class="px-4 py-3">
                                             <span class="badge bg-light text-dark border">{{ $voucher->nama }}</span>
@@ -206,3 +243,71 @@
         }
     </style>
 </x-app-layout>
+
+<form id="bulkDeleteForm" action="{{ route('admin.vouchers.destroySelected') }}" method="POST" style="display: none;">
+    @csrf
+    @method('DELETE')
+    <input type="hidden" name="voucher_ids" id="bulkDeleteInput">
+</form>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const selectAll = document.getElementById('selectAll');
+        const checkboxes = document.querySelectorAll('.voucher-checkbox');
+
+        // Handle Select All
+        if(selectAll) {
+            selectAll.addEventListener('change', function() {
+                checkboxes.forEach(cb => {
+                    cb.checked = this.checked;
+                });
+            });
+        }
+
+        // Handle individual checkbox change to update Select All state
+        checkboxes.forEach(cb => {
+            cb.addEventListener('change', function() {
+                if (!this.checked) {
+                    selectAll.checked = false;
+                } else {
+                    const allChecked = Array.from(checkboxes).every(c => c.checked);
+                    if (allChecked) selectAll.checked = true;
+                }
+            });
+        });
+    });
+
+    function submitBulkDelete() {
+        // Collect checked IDs
+        const checkboxes = document.querySelectorAll('.voucher-checkbox:checked');
+        if (checkboxes.length === 0) {
+            alert('Pilih setidaknya satu voucher untuk dihapus.');
+            return;
+        }
+
+        if (!confirm('Yakin ingin menghapus ' + checkboxes.length + ' voucher terpilih?')) {
+            return;
+        }
+
+        const ids = Array.from(checkboxes).map(cb => cb.value);
+        
+        // Prepare hidden form
+        const form = document.getElementById('bulkDeleteForm');
+        // We need to append multiple inputs for array support in Laravel
+        // Clean previous inputs if any (except csrf and method)
+        // Or simpler: just create inputs dynamically
+        
+        // Remove existing dynamic inputs
+        form.querySelectorAll('input[name="voucher_ids[]"]').forEach(el => el.remove());
+
+        ids.forEach(id => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'voucher_ids[]';
+            input.value = id;
+            form.appendChild(input);
+        });
+
+        form.submit();
+    }
+</script>

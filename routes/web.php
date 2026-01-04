@@ -21,7 +21,7 @@ Route::middleware('auth')->group(function () {
 // =================== ROUTE PEMBELIAN PUBLIK (TANPA LOGIN) ===================
 Route::get('/beli/{id}', [PublicOrderController::class, 'beli'])->name('public.beli');
 Route::post('/order/store', [PublicOrderController::class, 'store'])->name('public.order.store');
-Route::get('/order/success/{orderId}', [PublicOrderController::class, 'success'])->name('public.order.success');
+Route::match(['get', 'post'], '/order/success/{orderId}', [PublicOrderController::class, 'success'])->name('public.order.success');
 Route::post('/ipaymu/callback', [PublicOrderController::class, 'handleCallback'])->name('ipaymu.callback');
 Route::get('/order/callback', [PublicOrderController::class, 'handleReturnUrl'])->name('public.order.return');
 Route::get('/order/cancel/{order_id}', [PublicOrderController::class, 'cancelOrder'])->name('public.order.cancel');
@@ -45,6 +45,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     // Order routes khusus admin
     Route::get('/orders/print', [OrderController::class, 'printPdf'])->name('orders.print');
     Route::delete('/orders/delete-all', [OrderController::class, 'deleteAll'])->name('orders.deleteAll');
+    Route::delete('/orders/destroy-selected', [OrderController::class, 'destroySelected'])->name('orders.destroySelected');
+    Route::delete('/orders/destroy-by-filter', [OrderController::class, 'destroyByFilter'])->name('orders.destroyByFilter');
     Route::resource('orders', OrderController::class);
 
 
