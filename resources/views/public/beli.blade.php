@@ -77,6 +77,19 @@
                                 @enderror
                             </div>
 
+                            <div class="form-floating mb-4">
+                                <input type="tel" name="phone" id="phone"
+                                    class="form-control @error('phone') is-invalid @enderror" value="{{ old('phone') }}"
+                                    placeholder="08123456789" pattern="[0-9]{10,13}">
+                                <label for="phone">
+                                    <i class="fas fa-phone me-2"></i>Nomor Telepon (Opsional)
+                                </label>
+                                <small class="text-muted">Format: 08123456789 (10-13 digit)</small>
+                                @error('phone')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
                             <!-- BAGIAN PERSETUJUAN (Client Side Only) -->
                             <div class="mb-4 p-3 bg-light rounded border">
                                 <div class="form-check">

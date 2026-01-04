@@ -31,6 +31,7 @@ class PublicOrderController extends Controller
             'paket_id' => 'required|exists:pakets,id',
             'nama'     => 'required|string|max:255',
             'email'    => 'required|email|max:255',
+            'phone'    => 'nullable|string|regex:/^[0-9]{10,13}$/',
         ]);
 
         $paket = Paket::findOrFail($request->paket_id);
@@ -65,72 +66,62 @@ class PublicOrderController extends Controller
                 ->with('error', 'Voucher tidak tersedia saat ini.');
         }
 
-        // iPaymu Configuration
-        $va = config('services.ipaymu.va');
-        $apiKey = config('services.ipaymu.api_key');
-        $baseUrl = config('services.ipaymu.base_url');
-        $url = $baseUrl . '/payment';
-
-        // Generate simple reference ID (just order ID)
-        $referenceId = (string)$order->id;
-
-        // Build request payload
-        $payload = [
-            'product'     => [$paket->nama],
-            'qty'         => [1],
-            'price'       => [(int)$paket->price],
-            'returnUrl'   => route('public.order.return', ['orderId' => $order->id]), // User redirect (no auto-update)
-            'cancelUrl'   => route('public.order.cancel', ['order_id' => $order->id]),
-            'notifyUrl'   => route('public.order.callback', ['orderId' => $order->id]), // Payment callback (auto-update)
-            'referenceId' => $referenceId,
-            'buyerName'   => $request->nama,
-            'buyerEmail'  => $request->email,
-        ];
-
-        // Generate signature
-        $jsonBody = json_encode($payload, JSON_UNESCAPED_SLASHES);
-        $requestBody = strtolower(hash('sha256', $jsonBody));
-        $stringToSign = 'POST:' . $va . ':' . $requestBody . ':' . $apiKey;
-        $signature = hash_hmac('sha256', $stringToSign, $apiKey);
-        $timestamp = date('YmdHis');
-
-        // Prepare HTTP client
-        $http = Http::withHeaders([
-            'Content-Type' => 'application/json',
-            'va'           => $va,
-            'signature'    => $signature,
-            'timestamp'    => $timestamp,
-        ])->timeout(60);
-
-        if (app()->isLocal()) {
-            $http->withoutVerifying()->withOptions(['force_ip_resolve' => 'v4']);
+        if (!$order) {
+            return redirect()->route('tidaktersedia')
+                ->with('error', 'Voucher tidak tersedia saat ini.');
         }
 
-        // Log request
-        Log::info('=== iPaymu Payment Request ===', [
-            'url' => $url,
-            'payload' => $payload,
-            'signature' => $signature,
-            'timestamp' => $timestamp,
-        ]);
+        // ==========================================
+        // BYPASS PAYMENT FOR LOCAL TESTING
+        // ==========================================
+        if (app()->isLocal()) {
+            DB::transaction(function () use ($order) {
+                $order->update(['status' => 'terkirim']);
+                if ($order->voucher) {
+                    $order->voucher->update(['status' => 'nonaktif', 'available' => 0]);
+                }
+                Mail::to($order->email)->send(new VoucherCodeMail($order->voucher));
+            });
+            
+            Log::info('Local Payment Bypass: Order automatically approved', ['orderId' => $order->id]);
+            
+            return redirect()->route('public.order.success', ['orderId' => $order->id]);
+        }
+        // ==========================================
 
-        // Make request
-        $response = $http->post($url, $payload);
-        $result = $response->json();
+        // Use iPaymu Service
+        $ipaymu = new \App\Services\IPaymuService();
+        
+        // Membersihkan nama produk untuk Sandbox (Hanya huruf dan angka)
+        $cleanProductName = preg_replace('/[^a-zA-Z0-9 ]/', '', $paket->nama);
+        if (empty($cleanProductName)) $cleanProductName = 'Voucher Wifi';
 
-        // Log response
-        Log::info('=== iPaymu Payment Response ===', [
-            'status_code' => $response->status(),
-            'result' => $result,
-        ]);
+        $paymentData = [
+            'product'     => [$cleanProductName], // Nama produk bersih
+            'qty'         => [1],                 // Integer murni
+            'price'       => [(int)$paket->price], // Integer murni
+            'returnUrl'   => route('public.order.return', ['orderId' => $order->id]),
+            'cancelUrl'   => route('public.order.cancel', ['order_id' => $order->id]),
+            'notifyUrl'   => route('public.order.callback', ['orderId' => $order->id]),
+            'referenceId' => (string)$order->id,
+            'buyerName'   => $request->nama,
+            'buyerEmail'  => $request->email,
+            'buyerPhone'  => $request->phone ?? '',
+        ];
 
-        if ($response->successful() && isset($result['Status']) && $result['Status'] == 200) {
-            Log::info('Payment URL generated successfully', ['url' => $result['Data']['Url']]);
-            return redirect()->away($result['Data']['Url']);
+        $result = $ipaymu->createPayment($paymentData);
+
+        if ($result['success']) {
+            Log::info('Payment URL generated successfully', [
+                'mode' => $ipaymu->getModeName(),
+                'url' => $result['data']['Data']['Url']
+            ]);
+            return redirect()->away($result['data']['Data']['Url']);
         } else {
             Log::error('iPaymu Payment Error', [
-                'status_code' => $response->status(),
-                'result' => $result,
+                'mode' => $ipaymu->getModeName(),
+                'status_code' => $result['status_code'],
+                'result' => $result['data'],
             ]);
             return back()->with('error', 'Gagal membuat sesi pembayaran. Silakan coba lagi.');
         }
@@ -206,47 +197,57 @@ class PublicOrderController extends Controller
 
     private function checkTransactionStatus($transactionId)
     {
-        $va        = config('services.ipaymu.va');
-        $apiKey    = config('services.ipaymu.api_key');
-        $baseUrl   = config('services.ipaymu.base_url');
-        $url       = $baseUrl . '/transaction'; // Tambahkan endpoint transaction
-
-        $body = ['transactionId' => $transactionId];
-        $jsonBody     = json_encode($body, JSON_UNESCAPED_SLASHES);
-        $requestBody  = strtolower(hash('sha256', $jsonBody));
-        $stringToSign = 'POST:' . $va . ':' . $requestBody . ':' . $apiKey;
-        $signature    = hash_hmac('sha256', $stringToSign, $apiKey);
-        $timestamp    = Date('YmdHis');
-
-
-        $http = Http::withHeaders([
-            'Content-Type' => 'application/json', 'signature'    => $signature,
-            'va'           => $va, 'timestamp'    => $timestamp,
-        ])->timeout(60)->withOptions(['force_ip_resolve' => 'v4']);
-
-        if (app()->isLocal()) {
-            $http->withoutVerifying();
-        }
-
-        $response = $http->post($url, $body); // Gunakan URL dinamis
-
-        if ($response->successful() && $response->json()['Status'] == 200) {
-            return $response->json()['Data'];
-        }
-
-        Log::error('iPaymu Check Status Error: ', $response->json() ?? []);
-        return null;
+        $ipaymu = new \App\Services\IPaymuService();
+        return $ipaymu->checkTransactionStatus($transactionId);
     }
 
     /**
      * Handle return URL - User clicked "Back to Merchant"
      * DO NOT auto-update status here! Only show current order status.
      */
-    public function returnUrl($orderId)
+    /**
+     * Handle return URL - User clicked "Back to Merchant" or auto-redirect
+     * ACTIVE CHECK: Check iPaymu status immediately because Callback might fail on localhost
+     */
+    public function returnUrl(Request $request, $orderId)
     {
         $order = Order::with(['paket', 'voucher'])->findOrFail($orderId);
         
-        // Just show the order status, don't modify anything
+        // Jika status masih menunggu, coba cek status ke iPaymu sekarang juga
+        if ($order->status === 'menunggu') {
+            
+            // Coba ambil trx_id dari URL (biasanya iPaymu kasih)
+            $trx_id = $request->query('trx_id');
+            
+            // Jika user kembali dengan status=berhasil, kita cek
+            if ($request->query('status') == 'berhasil' && $trx_id) {
+                 $transaction = $this->checkTransactionStatus($trx_id);
+                 
+                 // 1=Success, 6=Paid/Settled
+                 if ($transaction && ($transaction['Status'] == 1 || $transaction['Status'] == 6)) { 
+                     
+                     DB::transaction(function () use ($order) {
+                        $order->update(['status' => 'terkirim']);
+                        if ($order->voucher) {
+                            $order->voucher->update(['status' => 'nonaktif', 'available' => 0]);
+                        }
+                        Mail::to($order->email)->send(new VoucherCodeMail($order->voucher));
+                    });
+                    
+                    Log::info('Order updated via Return URL check', ['orderId' => $orderId]);
+                    
+                    // Redirect ke halaman sukses final
+                    return redirect()->route('public.order.success', ['orderId' => $order->id]);
+                 }
+            }
+        }
+        
+        // Jika sudah sukses, langsung lempar ke success page
+        if ($order->status === 'terkirim') {
+            return redirect()->route('public.order.success', ['orderId' => $order->id]);
+        }
+        
+        // Jika masih menunggu atau gagal, tampilkan status page
         return view('public.order-status', compact('order'));
     }
 

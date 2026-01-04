@@ -32,10 +32,22 @@ return [
     ],
 
     'ipaymu' => [
+        'sandbox' => env('IPAYMU_SANDBOX', true),
         'va' => env('IPAYMU_VA'),
         'api_key' => env('IPAYMU_API_KEY'),
-        'base_url' => env('IPAYMU_URL', 'https://sandbox.ipaymu.com/api/v2'),
-        'sandbox' => env('IPAYMU_SANDBOX', true),
+        
+        // Auto-switch base URL based on sandbox mode
+        'base_url' => env('IPAYMU_SANDBOX', true) 
+            ? 'https://sandbox.ipaymu.com/api/v2'  // Sandbox URL
+            : 'https://my.ipaymu.com/api/v2',      // Production URL
+        
+        // Sandbox credentials (for testing)
+        'sandbox_va' => env('IPAYMU_SANDBOX_VA'),
+        'sandbox_api_key' => env('IPAYMU_SANDBOX_API_KEY'),
+        
+        // Production credentials
+        'production_va' => env('IPAYMU_PRODUCTION_VA'),
+        'production_api_key' => env('IPAYMU_PRODUCTION_API_KEY'),
     ],
 
     // // config/services.php
