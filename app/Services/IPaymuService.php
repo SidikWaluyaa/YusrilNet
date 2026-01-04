@@ -83,10 +83,11 @@ class IPaymuService
         // Log the final payload for debugging
         Log::info('iPaymu Clean Payload', $payload);
 
-        // Generate signature
+        // Generate signature correctly using the helper method
         $signature = $this->generateSignature($payload);
         $jsonBody = json_encode($payload, JSON_UNESCAPED_SLASHES);
-        $signature = hash_hmac('sha256', 'POST:' . $this->va . ':' . $jsonBody . ':' . $this->apiKey, $this->apiKey);
+        
+        // Removed incorrect overwrite of $signature
 
         try {
             $response = Http::withHeaders([
