@@ -1,21 +1,17 @@
 <?php
 
-require __DIR__ . '/../vendor/autoload.php';
+echo "<h1>Hardcode Credential Check (Native CURL)</h1>";
 
-use Illuminate\Support\Facades\Http;
-
-echo "<h1>Hardcode Credential Check</h1>";
-
-// DATA HARDCODE (JANGAN DICOPY UNTUK PRODUKSI)
+// DATA HARDCODE
 $va = '1179005720664738';
 $apiKey = '0FBDB682-6860-4221-86D7-097CB31294FA';
-$url = 'https://my.ipaymu.com/api/v2/balance'; // Production URL
+$url = 'https://my.ipaymu.com/api/v2/balance'; 
 
 echo "VA: $va <br>";
 echo "URL: $url <br>";
 echo "Key: " . substr($apiKey, 0, 5) . "... (Hidden)<br>";
 
-// Logic Signature
+// Prepare Data
 $body = ['account' => $va];
 $jsonBody = json_encode($body, JSON_UNESCAPED_SLASHES);
 $stringToSign = "POST:" . $va . ":" . $jsonBody . ":" . $apiKey;
@@ -23,31 +19,49 @@ $signature = hash_hmac('sha256', $stringToSign, $apiKey);
 
 echo "<br>Sending Request...<br>";
 
-try {
-    // Gunakan Guzzle HTTP Client bawaan Laravel (via Facade) tapi manual
-    $response = Http::withHeaders([
-        'Content-Type' => 'application/json',
-        'signature' => $signature,
-        'va' => $va,
-        'timestamp' => date('YmdHis'),
-    ])->withBody($jsonBody, 'application/json')->post($url);
+// CURL MANUAL
+$ch = curl_init();
 
-    echo "<h3>Result:</h3>";
-    echo "Status Code: <b>" . $response->status() . "</b><br>";
-    
-    $json = $response->json();
-    echo "<pre>" . print_r($json, true) . "</pre>";
-    
-    if ($response->status() == 200 && isset($json['Data'])) {
-        echo "<h2 style='color:green'>BERHASIL! AKUN AMAN.</h2>";
-        echo "Saldo: " . $json['Data']['Balance'];
-    } elseif ($response->status() == 401) {
-        echo "<h2 style='color:red'>GAGAL: UNAUTHORIZED</h2>";
-        echo "Artinya: VA atau API Key SALAH, atau IP Server belum di-whitelist.";
-    } else {
-        echo "<h2 style='color:orange'>GAGAL LAINNYA</h2>";
-    }
+$headers = [
+    'Content-Type: application/json',
+    'signature: ' . $signature,
+    'va: ' . $va,
+    'timestamp: ' . date('YmdHis')
+];
 
-} catch (\Exception $e) {
-    echo "Error: " . $e->getMessage();
+curl_setopt($ch, CURLOPT_URL, $url);
+curl_setopt($ch, CURLOPT_POST, 1);
+curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonBody);
+curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+// Bypass SSL jika perlu (untuk debug saja)
+curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+
+$server_output = curl_exec($ch);
+$http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+$error_msg = curl_error($ch);
+
+curl_close($ch);
+
+echo "<h3>Result:</h3>";
+echo "HTTP Status: <b>$http_code</b><br>";
+
+if ($error_msg) {
+    echo "CURL Error: $error_msg<br>";
+}
+
+echo "Response Body:<br>";
+echo "<pre>" . htmlspecialchars($server_output) . "</pre>";
+
+$json = json_decode($server_output, true);
+
+if ($http_code == 200 && isset($json['Status']) && $json['Status'] == 200) {
+    echo "<h2 style='color:green'>BERHASIL! AKUN AMAN.</h2>";
+} elseif ($http_code == 401) {
+    echo "<h2 style='color:red'>GAGAL: 401 UNAUTHORIZED</h2>";
+    echo "Penyebab: VA/Key Salah atau IP Server belum Whitelist.";
+} else {
+    echo "<h2 style='color:orange'>GAGAL: CODE $http_code</h2>";
 }
