@@ -34,7 +34,8 @@ return [
     'ipaymu' => [
         'va' => env('IPAYMU_VA'),
         'api_key' => env('IPAYMU_API_KEY'),
-        'base_url' => env('IPAYMU_SANDBOX_URL'), // Changed from 'url' and 'IPAYMU_SANDBOX_URL'
+        'base_url' => env('IPAYMU_URL', 'https://sandbox.ipaymu.com/api/v2'),
+        'sandbox' => env('IPAYMU_SANDBOX', true),
     ],
 
     // // config/services.php

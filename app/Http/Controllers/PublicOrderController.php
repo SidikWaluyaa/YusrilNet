@@ -79,9 +79,9 @@ class PublicOrderController extends Controller
             'product'     => [$paket->nama],
             'qty'         => [1],
             'price'       => [(int)$paket->price],
-            'returnUrl'   => route('public.order.success', ['orderId' => $order->id]),
+            'returnUrl'   => route('public.order.return', ['orderId' => $order->id]), // User redirect (no auto-update)
             'cancelUrl'   => route('public.order.cancel', ['order_id' => $order->id]),
-            'notifyUrl'   => route('public.order.success', ['orderId' => $order->id]),
+            'notifyUrl'   => route('public.order.callback', ['orderId' => $order->id]), // Payment callback (auto-update)
             'referenceId' => $referenceId,
             'buyerName'   => $request->nama,
             'buyerEmail'  => $request->email,
@@ -238,33 +238,76 @@ class PublicOrderController extends Controller
         return null;
     }
 
-    // handleCallback dan success() bisa Anda biarkan atau hapus jika mau
-    public function handleCallback(Request $request) { /* ... */ }
+    /**
+     * Handle return URL - User clicked "Back to Merchant"
+     * DO NOT auto-update status here! Only show current order status.
+     */
+    public function returnUrl($orderId)
+    {
+        $order = Order::with(['paket', 'voucher'])->findOrFail($orderId);
+        
+        // Just show the order status, don't modify anything
+        return view('public.order-status', compact('order'));
+    }
+
+    /**
+     * Handle callback URL - iPaymu payment notification
+     * This is where we verify and update payment status
+     */
+    public function callback(Request $request, $orderId)
+    {
+        // Log callback for debugging
+        Log::info('=== iPaymu Callback Received ===', [
+            'orderId' => $orderId,
+            'request_data' => $request->all(),
+        ]);
+
+        $order = Order::with(['paket', 'voucher'])->findOrFail($orderId);
+
+        // Only update if still pending
+        if ($order->status === 'menunggu') {
+            // Verify payment status from iPaymu
+            $trx_id = $request->input('trx_id');
+            
+            if ($trx_id) {
+                $transaction = $this->checkTransactionStatus($trx_id);
+                
+                // Only update if payment is confirmed
+                if ($transaction && $transaction['Status'] == 1) {
+                    DB::transaction(function () use ($order) {
+                        $order->update(['status' => 'terkirim']);
+                        if ($order->voucher) {
+                            $order->voucher->update(['status' => 'nonaktif', 'available' => 0]);
+                        }
+                        // Send email with voucher code
+                        Mail::to($order->email)->send(new VoucherCodeMail($order->voucher));
+                    });
+                    
+                    Log::info('Order payment confirmed', ['orderId' => $orderId]);
+                }
+            }
+        }
+
+        // Return JSON response for iPaymu server
+        return response()->json([
+            'success' => true,
+            'message' => 'Callback received',
+            'order_id' => $orderId,
+        ]);
+    }
+    /**
+     * Success page - Show order details after payment
+     */
     public function success($orderId)
     {
         $order = Order::with(['paket', 'voucher'])->findOrFail($orderId);
         
-        // Auto-update status if still pending
-        if ($order->status === 'menunggu') {
-            DB::transaction(function () use ($order) {
-                $order->update(['status' => 'terkirim']);
-                if ($order->voucher) {
-                    $order->voucher->update(['status' => 'nonaktif', 'available' => 0]);
-                }
-            });
-            $order->refresh();
+        // Only show success if order is actually paid
+        if ($order->status !== 'terkirim') {
+            return redirect()->route('public.order.return', $orderId)
+                ->with('warning', 'Pembayaran Anda masih dalam proses verifikasi.');
         }
         
-        // Jika request dari iPaymu server (callback), return JSON
-        if (request()->isMethod('POST') || request()->header('Content-Type') === 'application/json') {
-            return response()->json([
-                'success' => true,
-                'message' => 'Payment received',
-                'order_id' => $orderId,
-            ]);
-        }
-        
-        // Jika dari browser (user redirect), tampilkan view
         return view('public.success', compact('order'));
     }
 }

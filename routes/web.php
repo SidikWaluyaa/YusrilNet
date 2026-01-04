@@ -21,9 +21,17 @@ Route::middleware('auth')->group(function () {
 // =================== ROUTE PEMBELIAN PUBLIK (TANPA LOGIN) ===================
 Route::get('/beli/{id}', [PublicOrderController::class, 'beli'])->name('public.beli');
 Route::post('/order/store', [PublicOrderController::class, 'store'])->name('public.order.store');
-Route::match(['get', 'post'], '/order/success/{orderId}', [PublicOrderController::class, 'success'])->name('public.order.success');
-Route::post('/ipaymu/callback', [PublicOrderController::class, 'handleCallback'])->name('ipaymu.callback');
-Route::get('/order/callback', [PublicOrderController::class, 'handleReturnUrl'])->name('public.order.return');
+
+// Return URL - User redirect (no auto-update)
+Route::get('/order/return/{orderId}', [PublicOrderController::class, 'returnUrl'])->name('public.order.return');
+
+// Callback URL - iPaymu payment notification (auto-update)
+Route::match(['get', 'post'], '/order/callback/{orderId}', [PublicOrderController::class, 'callback'])->name('public.order.callback');
+
+// Success page - Show order details
+Route::get('/order/success/{orderId}', [PublicOrderController::class, 'success'])->name('public.order.success');
+
+// Cancel order
 Route::get('/order/cancel/{order_id}', [PublicOrderController::class, 'cancelOrder'])->name('public.order.cancel');
 
 // =================== ADMIN ROUTE ===================
