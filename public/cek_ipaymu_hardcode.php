@@ -2,6 +2,16 @@
 
 echo "<h1>Hardcode Credential Check (Native CURL)</h1>";
 
+// 1. CEK REAL OUTBOUND IP
+echo "<h3>Checking Server Outbound IP...</h3>";
+$ch_ip = curl_init('https://api.ipify.org');
+curl_setopt($ch_ip, CURLOPT_RETURNTRANSFER, true);
+$real_ip = curl_exec($ch_ip);
+curl_close($ch_ip);
+
+echo "Detected Outbound IP: <b>" . $real_ip . "</b><br>";
+echo "(IP ini yang HARUS didaftarkan di Whitelist iPaymu, bukan Shared IP cPanel)<br><hr>";
+
 // DATA HARDCODE
 $va = '1179005720664738';
 $apiKey = '0FBDB682-6860-4221-86D7-097CB31294FA';
@@ -34,8 +44,6 @@ curl_setopt($ch, CURLOPT_POST, 1);
 curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonBody);
 curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-// Bypass SSL jika perlu (untuk debug saja)
 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
 
@@ -61,7 +69,7 @@ if ($http_code == 200 && isset($json['Status']) && $json['Status'] == 200) {
     echo "<h2 style='color:green'>BERHASIL! AKUN AMAN.</h2>";
 } elseif ($http_code == 401) {
     echo "<h2 style='color:red'>GAGAL: 401 UNAUTHORIZED</h2>";
-    echo "Penyebab: VA/Key Salah atau IP Server belum Whitelist.";
+    echo "Penyebab: VA/Key Salah atau IP Server ($real_ip) belum Whitelist.";
 } else {
     echo "<h2 style='color:orange'>GAGAL: CODE $http_code</h2>";
 }
