@@ -94,6 +94,7 @@ class IPaymuService
                 'signature'    => $signature,
                 'va'           => $this->va,
                 'timestamp'    => date('YmdHis'),
+                'Referer'      => config('app.url'), // Tambahkan Referer agar dikenali iPaymu
             ])->withBody($jsonBody, 'application/json')->post($url); // Force raw JSON body
 
             $result = $response->json();
