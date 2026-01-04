@@ -19,7 +19,8 @@ $url = 'https://my.ipaymu.com/api/v2/balance';
 // Prepare Data
 $body = ['account' => $va];
 $jsonBody = json_encode($body, JSON_UNESCAPED_SLASHES);
-$stringToSign = "POST:" . $va . ":" . $jsonBody . ":" . $apiKey;
+$requestBody = strtolower(hash('sha256', $jsonBody)); // HASH BODY DULU!
+$stringToSign = "POST:" . $va . ":" . $requestBody . ":" . $apiKey;
 $signature = hash_hmac('sha256', $stringToSign, $apiKey);
 
 // CURL MANUAL
