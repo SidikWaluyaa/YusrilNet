@@ -48,17 +48,24 @@ class PaketController extends Controller
         $request->validate([
             'nama' => 'required',
             'price' => 'required|integer',
-            'duration' => 'required|integer',
+            'duration_value' => 'required|integer|min:1',
+            'duration_unit' => 'required|in:jam,hari',
             'deskripsi' => 'required',
             'detail_paket' => 'required|array',
             'available' => 'required|integer',
         ]);
 
+        // Calculate total duration in hours
+        $duration = $request->duration_value;
+        if ($request->duration_unit === 'hari') {
+            $duration = $duration * 24;
+        }
+
         // Paket::create($request->all());
         Paket::create([
             'nama' => $request->nama,
             'price' => $request->price,
-            'duration' => $request->duration,
+            'duration' => $duration,
             'deskripsi' => $request->deskripsi,
             'detail_paket' => json_encode($request->detail_paket, JSON_PRETTY_PRINT),
             'available' => $request->available,
@@ -88,7 +95,8 @@ class PaketController extends Controller
         $request->validate([
             'nama' => 'required',
             'price' => 'required|integer',
-            'duration' => 'required|integer',
+            'duration_value' => 'required|integer|min:1',
+            'duration_unit' => 'required|in:jam,hari',
             'deskripsi' => 'required',
 
             // --- PERBAIKAN UTAMA DI SINI ---
@@ -100,6 +108,12 @@ class PaketController extends Controller
             'available' => 'required|integer',
         ]);
 
+        // Calculate total duration in hours
+        $duration = $request->duration_value;
+        if ($request->duration_unit === 'hari') {
+            $duration = $duration * 24;
+        }
+
         $paket = Paket::findOrFail($id);
 
         // Karena validasi di atas sudah memastikan $request->detail_paket adalah array,
@@ -107,7 +121,7 @@ class PaketController extends Controller
         $paket->update([
             'nama' => $request->nama,
             'price' => $request->price,
-            'duration' => $request->duration,
+            'duration' => $duration,
             'deskripsi' => $request->deskripsi,
             'detail_paket' => json_encode($request->detail_paket, JSON_PRETTY_PRINT),
             'available' => $request->available,

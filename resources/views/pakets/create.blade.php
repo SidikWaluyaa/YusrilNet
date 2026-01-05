@@ -42,10 +42,16 @@
 
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">
-                                Durasi (Jam) <span class="text-danger">*</span>
+                                Durasi <span class="text-danger">*</span>
                             </label>
-                            <input type="number" name="duration" class="form-control" 
-                                   placeholder="24" required min="1">
+                            <div class="input-group">
+                                <input type="number" name="duration_value" class="form-control" 
+                                       placeholder="Contoh: 1, 24" required min="1">
+                                <select name="duration_unit" class="form-select" style="max-width: 100px;">
+                                    <option value="jam">Jam</option>
+                                    <option value="hari">Hari</option>
+                                </select>
+                            </div>
                             <small class="text-muted">Masa aktif voucher</small>
                         </div>
 

@@ -41,10 +41,24 @@
 
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">
-                                Durasi (Jam) <span class="text-danger">*</span>
+                                Durasi <span class="text-danger">*</span>
                             </label>
-                            <input type="number" name="duration" class="form-control" 
-                                   value="{{ old('duration', $paket->duration) }}" required min="1">
+                            @php
+                                $val = $paket->duration;
+                                $unit = 'jam';
+                                if ($val >= 24 && $val % 24 == 0) {
+                                    $val = $val / 24;
+                                    $unit = 'hari';
+                                }
+                            @endphp
+                            <div class="input-group">
+                                <input type="number" name="duration_value" class="form-control" 
+                                       value="{{ old('duration_value', $val) }}" required min="1">
+                                <select name="duration_unit" class="form-select" style="max-width: 100px;">
+                                    <option value="jam" {{ old('duration_unit', $unit) == 'jam' ? 'selected' : '' }}>Jam</option>
+                                    <option value="hari" {{ old('duration_unit', $unit) == 'hari' ? 'selected' : '' }}>Hari</option>
+                                </select>
+                            </div>
                         </div>
 
                         <!-- Deskripsi -->
