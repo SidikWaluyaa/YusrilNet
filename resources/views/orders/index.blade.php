@@ -54,8 +54,8 @@
                                 </div>
                             </div>
                             <div class="flex-grow-1 ms-3">
-                                <div class="text-muted small mb-1">Total Order</div>
-                                <div class="h3 mb-0 fw-bold">{{ $orders->count() }}</div>
+                                <div class="text-muted small mb-1">Total Order (Berhasil)</div>
+                                <div class="h3 mb-0 fw-bold">{{ $total_orders }}</div>
                             </div>
                         </div>
                     </div>
@@ -73,7 +73,7 @@
                             </div>
                             <div class="flex-grow-1 ms-3">
                                 <div class="text-muted small mb-1">Selesai</div>
-                                <div class="h3 mb-0 fw-bold">{{ $orders->where('status', 'selesai')->count() }}</div>
+                                <div class="h3 mb-0 fw-bold">{{ $total_selesai }}</div>
                             </div>
                         </div>
                     </div>
@@ -92,7 +92,7 @@
                             <div class="flex-grow-1 ms-3">
                                 <div class="text-muted small mb-1">Pendapatan</div>
                                 <div class="h3 mb-0 fw-bold" style="font-size: 1.25rem;">
-                                    Rp {{ number_format($orders->sum('harga'), 0, ',', '.') }}
+                                    Rp {{ number_format($total_pendapatan, 0, ',', '.') }}
                                 </div>
                             </div>
                         </div>
@@ -211,6 +211,10 @@
                                         </td>
                                         <td class="px-4 py-3 text-end">
                                             <div class="btn-group btn-group-sm">
+                                                <a href="{{ route('admin.orders.show', $order->id) }}" 
+                                                   class="btn btn-outline-info" title="Lihat Detail">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
                                                 <a href="{{ route('admin.orders.edit', $order->id) }}" 
                                                    class="btn btn-outline-warning" title="Edit">
                                                     <i class="fas fa-edit"></i>

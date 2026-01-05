@@ -16,13 +16,26 @@ class OrderController extends Controller
 {
     public function index()
     {
-
+        // Hitung statistik dengan query terpisah agar akurat (tidak terpengaruh pagination)
+        $total_orders = Order::whereIn('status', ['terkirim', 'selesai'])->count();
+        $total_selesai = Order::where('status', 'selesai')->count();
+        // Pendapatan diambil dari order yang berhasil terkirim dan selesai
+        $total_pendapatan = Order::whereIn('status', ['terkirim', 'selesai'])->sum('harga');
 
         $orders = Order::with(['paket', 'voucher', 'user'])
             ->orderBy('created_at', 'desc')
             ->paginate(10); // Menggunakan pagination
 
-        return view('orders.index', compact('orders'));
+        return view('orders.index', compact('orders', 'total_orders', 'total_selesai', 'total_pendapatan'));
+    }
+
+    /**
+     * Show the specified resource.
+     */
+    public function show($id)
+    {
+        $order = Order::with(['paket', 'voucher', 'user'])->findOrFail($id);
+        return view('orders.show', compact('order'));
     }
 
     /**
