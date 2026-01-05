@@ -171,10 +171,19 @@
                                         </td>
                                         <td class="px-4 py-3">
                                             @if($order->voucher)
-                                                <div class="small">
-                                                    <code style="background: #f8f9fa; padding: 0.25rem 0.5rem; border-radius: 4px;">
-                                                        {{ $order->voucher->username }}
-                                                    </code>
+                                                <div class="d-flex flex-column gap-1">
+                                                    <div class="small">
+                                                        <span class="text-muted me-1" style="font-size: 0.7rem;">User:</span>
+                                                        <code style="background: #f8f9fa; padding: 0.15rem 0.4rem; border-radius: 4px; color: var(--primary);">
+                                                            {{ $order->voucher->username }}
+                                                        </code>
+                                                    </div>
+                                                    <div class="small">
+                                                        <span class="text-muted me-1" style="font-size: 0.7rem;">Pass:</span>
+                                                        <code style="background: #f8f9fa; padding: 0.15rem 0.4rem; border-radius: 4px; color: var(--danger);">
+                                                            {{ $order->voucher->password }}
+                                                        </code>
+                                                    </div>
                                                 </div>
                                             @else
                                                 <span class="text-muted small">-</span>
