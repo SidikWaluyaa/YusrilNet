@@ -10,3 +10,4 @@ Artisan::command('inspire', function () {
 use Illuminate\Support\Facades\Schedule;
 
 Schedule::command('orders:expire')->everyMinute();
+Schedule::command('app:check-payments')->everyMinute();

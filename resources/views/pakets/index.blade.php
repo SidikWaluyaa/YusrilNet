@@ -92,7 +92,7 @@
                                     <tr>
                                         <td class="px-4 py-3">
                                             <div class="fw-semibold">{{ $paket->nama }}</div>
-                                            <div class="text-muted small">{{ Str::limit($paket->deskripsi, 50) }}</div>
+                                            <div class="text-muted small">{{ \Illuminate\Support\Str::limit($paket->deskripsi, 50) }}</div>
                                         </td>
                                         <td class="px-4 py-3">
                                             <span class="fw-bold" style="color: var(--neptune-blue);">

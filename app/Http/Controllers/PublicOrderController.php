@@ -72,21 +72,28 @@ class PublicOrderController extends Controller
         }
 
         // ==========================================
-        // BYPASS PAYMENT FOR LOCAL TESTING
+        // BYPASS PAYMENT FOR LOCAL TESTING (DISABLED)
         // ==========================================
+        /*
         if (app()->isLocal()) {
-            DB::transaction(function () use ($order) {
+            $statusUpdated = false;
+            DB::transaction(function () use ($order, &$statusUpdated) {
                 $order->update(['status' => 'terkirim']);
                 if ($order->voucher) {
                     $order->voucher->update(['status' => 'nonaktif', 'available' => 0]);
                 }
-                Mail::to($order->email)->send(new VoucherCodeMail($order->voucher));
+                $statusUpdated = true;
             });
+            
+            if ($statusUpdated && $order->voucher) {
+                Mail::to($order->email)->send(new VoucherCodeMail($order->voucher));
+            }
             
             Log::info('Local Payment Bypass: Order automatically approved', ['orderId' => $order->id]);
             
             return redirect()->route('public.order.success', ['orderId' => $order->id]);
         }
+        */
         // ==========================================
 
         // Use iPaymu Service
@@ -112,6 +119,9 @@ class PublicOrderController extends Controller
         $result = $ipaymu->createPayment($paymentData);
 
         if ($result['success']) {
+            // Simpan SessionID iPaymu ke kolom snap_token untuk recon nanti
+            $order->update(['snap_token' => $result['data']['Data']['SessionID']]);
+
             Log::info('Payment URL generated successfully', [
                 'mode' => $ipaymu->getModeName(),
                 'url' => $result['data']['Data']['Url']
@@ -213,42 +223,58 @@ class PublicOrderController extends Controller
     {
         $order = Order::with(['paket', 'voucher'])->findOrFail($orderId);
         
-        // Jika status masih menunggu, coba cek status ke iPaymu sekarang juga
+        // 1. Jika URL callback sukses membawa trx_id dari iPaymu
+        $trx_id = $request->query('trx_id');
+        // 2. Jika tidak ada trx_id, kita pakai ReferenceId = orderId (Standar SidikNet ke iPaymu)
+        // Note: API iPaymu CheckTransaction butuh TransactionId (trx_id), bukan ReferenceId. 
+        // Namun, demi keamanan, kita hanya akan mengecek jika trx_id tersedia. Jika tidak, iPaymu gagal mengirimnya.
+        
         if ($order->status === 'menunggu') {
-            
-            // Coba ambil trx_id dari URL (biasanya iPaymu kasih)
-            $trx_id = $request->query('trx_id');
-            
-            // Jika user kembali dengan status=berhasil, kita cek
-            if ($request->query('status') == 'berhasil' && $trx_id) {
+            if ($trx_id) {
                  $transaction = $this->checkTransactionStatus($trx_id);
                  
                  // 1=Success, 6=Paid/Settled
                  if ($transaction && ($transaction['Status'] == 1 || $transaction['Status'] == 6)) { 
                      
-                     DB::transaction(function () use ($order) {
-                        $order->update(['status' => 'terkirim']);
-                        if ($order->voucher) {
-                            $order->voucher->update(['status' => 'nonaktif', 'available' => 0]);
+                     $statusUpdated = false;
+                     DB::transaction(function () use ($order, &$statusUpdated) {
+                        // Double check agar tidak dobel update jika webhook ternyata masuk duluan
+                        $freshOrder = Order::lockForUpdate()->find($order->id);
+                        if ($freshOrder->status === 'menunggu') {
+                            $freshOrder->update(['status' => 'terkirim']);
+                            if ($freshOrder->voucher) {
+                                $freshOrder->voucher->update(['status' => 'nonaktif', 'available' => 0]);
+                            }
+                            $statusUpdated = true;
                         }
-                        Mail::to($order->email)->send(new VoucherCodeMail($order->voucher));
                     });
                     
-                    Log::info('Order updated via Return URL check', ['orderId' => $orderId]);
+                    // Email dikirim SETELAH transaksi DB selesai dan di-commit
+                    if ($statusUpdated && $order->voucher) {
+                        Mail::to($order->email)->send(new VoucherCodeMail($order->voucher));
+                        Log::info('Order updated & Email sent via Return URL check', ['orderId' => $orderId]);
+                    }
                     
                     // Redirect ke halaman sukses final
                     return redirect()->route('public.order.success', ['orderId' => $order->id]);
                  }
+            } else {
+               // Fallback: Jika iPaymu melempar ke ReturnURL tapi TANPA trx_id, 
+               // Atau nge-blank. Kemungkinan user cancel atau close tab sebelum beres.
+               Log::warning('Return URL accessed without trx_id for pending order', [
+                   'orderId' => $orderId,
+                   'query' => $request->all()
+               ]);
             }
         }
         
-        // Jika sudah sukses, langsung lempar ke success page
-        if ($order->status === 'terkirim') {
+        // Jika sudah sukses terkirim (oleh webhook atau pengecekan barusan)
+        if ($order->fresh()->status === 'terkirim') {
             return redirect()->route('public.order.success', ['orderId' => $order->id]);
         }
         
-        // Jika masih menunggu atau gagal, tampilkan status page
-        return view('public.order-status', compact('order'));
+        // Jika status masih menunggu, tampilkan warning ke user
+        return view('public.order-status', compact('order'))->with('error', 'Pembayaran sedang diproses / belum berstatus Lunas di sistem kami. Harap refresh halaman ini berkala.');
     }
 
     /**
@@ -275,16 +301,20 @@ class PublicOrderController extends Controller
                 
                 // Only update if payment is confirmed
                 if ($transaction && $transaction['Status'] == 1) {
-                    DB::transaction(function () use ($order) {
+                    $statusUpdated = false;
+                    DB::transaction(function () use ($order, &$statusUpdated) {
                         $order->update(['status' => 'terkirim']);
                         if ($order->voucher) {
                             $order->voucher->update(['status' => 'nonaktif', 'available' => 0]);
                         }
-                        // Send email with voucher code
-                        Mail::to($order->email)->send(new VoucherCodeMail($order->voucher));
+                        $statusUpdated = true;
                     });
                     
-                    Log::info('Order payment confirmed', ['orderId' => $orderId]);
+                    if ($statusUpdated && $order->voucher) {
+                        // Send email with voucher code in background
+                        Mail::to($order->email)->send(new VoucherCodeMail($order->voucher));
+                        Log::info('Order payment confirmed via Callback & Email queued', ['orderId' => $orderId]);
+                    }
                 }
             }
         }

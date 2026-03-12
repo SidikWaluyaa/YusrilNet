@@ -107,10 +107,10 @@
                 <div class="relative" x-data="{ open: false }">
                     <button @click="open = !open"
                         class="flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-full text-white hover:bg-white/20 focus:outline-none transition duration-150 ease-in-out bg-white/10 backdrop-blur-sm">
-                        <div class="mr-2">{{ Auth::user()->name }}</div>
+                        <div class="mr-2">{{ auth()->user()->name }}</div>
                         <div
                             class="bg-white text-indigo-600 rounded-full h-8 w-8 flex items-center justify-center font-bold uppercase">
-                            {{ substr(Auth::user()->name, 0, 1) }}
+                            {{ substr(auth()->user()->name, 0, 1) }}
                         </div>
                         <div class="ms-1">
                             <svg class="fill-current h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg"
@@ -255,11 +255,11 @@
             <div class="px-4 flex items-center">
                 <div
                     class="bg-white text-indigo-600 rounded-full h-10 w-10 flex items-center justify-center font-bold uppercase mr-3">
-                    {{ substr(Auth::user()->name, 0, 1) }}
+                    {{ substr(auth()->user()->name, 0, 1) }}
                 </div>
                 <div>
-                    <div class="font-medium text-base text-white">{{ Auth::user()->name }}</div>
-                    <div class="font-medium text-sm text-white/70">{{ Auth::user()->email }}</div>
+                    <div class="font-medium text-base text-white">{{ auth()->user()->name }}</div>
+                    <div class="font-medium text-sm text-white/70">{{ auth()->user()->email }}</div>
                 </div>
             </div>
 

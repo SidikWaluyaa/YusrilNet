@@ -53,15 +53,17 @@
                                     $details = json_decode($paket->detail_paket, true);
                                     if (!is_array($details)) $details = [];
                                 @endphp
-                                @forelse($details as $detail)
-                                    <li class="mb-2">
-                                        <i class="fas fa-check-circle text-success me-2"></i>{{ $detail }}
-                                    </li>
-                                @empty
+                                @if(count($details) > 0)
+                                    @foreach($details as $detail)
+                                        <li class="mb-2">
+                                            <i class="fas fa-check-circle text-success me-2"></i>{{ $detail }}
+                                        </li>
+                                    @endforeach
+                                @else
                                     <li class="text-muted">
                                         <i class="fas fa-times-circle text-danger me-2"></i>Detail tidak tersedia
                                     </li>
-                                @endforelse
+                                @endif
                             </ul>
                         </div>
                     </div>
