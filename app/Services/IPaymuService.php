@@ -214,4 +214,24 @@ class IPaymuService
     {
         return $this->isSandbox ? 'SANDBOX' : 'PRODUCTION';
     }
+
+    /**
+     * Check if transaction status indicates a successful payment
+     */
+    public function isPaid(?array $transaction): bool
+    {
+        if (!$transaction) {
+            return false;
+        }
+
+        $status = $transaction['Status'] ?? null;
+        $paidStatus = strtolower($transaction['PaidStatus'] ?? '');
+
+        // iPaymu Paid Statuses:
+        // Status 1 = Success / Berhasil
+        // Status 6 = Paid / Settled
+        // Status 7 = Escrow (QRIS / Virtual Account)
+        // PaidStatus = 'paid'
+        return in_array((int)$status, [1, 6, 7], true) || $paidStatus === 'paid';
+    }
 }

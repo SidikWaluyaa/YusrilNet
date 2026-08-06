@@ -53,7 +53,7 @@ class CheckPayments extends Command
                 // Gunakan snap_token (SessionID) untuk cek status
                 $transaction = $ipaymu->checkTransactionStatus($order->snap_token);
 
-                if ($transaction && ($transaction['Status'] == 1 || $transaction['Status'] == 6)) {
+                if ($transaction && $ipaymu->isPaid($transaction)) {
                     $statusUpdated = false;
                     
                     DB::transaction(function () use ($order, &$statusUpdated) {

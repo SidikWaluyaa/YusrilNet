@@ -1,0 +1,24 @@
+{
+  "name": "YusrilNet Admin",
+  "short_name": "YusrilNet",
+  "description": "WiFi Voucher Management System Admin Panel",
+  "start_url": "/admin/dashboard",
+  "display": "standalone",
+  "background_color": "#f8f9fa",
+  "theme_color": "#4361ee",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/Logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/Logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

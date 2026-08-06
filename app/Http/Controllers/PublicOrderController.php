@@ -222,25 +222,25 @@ class PublicOrderController extends Controller
     public function returnUrl(Request $request, $orderId)
     {
         $order = Order::with(['paket', 'voucher'])->findOrFail($orderId);
+        $ipaymu = new \App\Services\IPaymuService();
         
         // 1. Jika URL callback sukses membawa trx_id dari iPaymu
         $trx_id = $request->query('trx_id');
-        // 2. Jika tidak ada trx_id, kita pakai ReferenceId = orderId (Standar SidikNet ke iPaymu)
-        // Note: API iPaymu CheckTransaction butuh TransactionId (trx_id), bukan ReferenceId. 
-        // Namun, demi keamanan, kita hanya akan mengecek jika trx_id tersedia. Jika tidak, iPaymu gagal mengirimnya.
+        // 2. Jika tidak ada trx_id, gunakan snap_token (SessionID) yang tersimpan di DB
+        $checkId = $trx_id ?: $order->snap_token;
         
         if ($order->status === 'menunggu') {
-            if ($trx_id) {
-                 $transaction = $this->checkTransactionStatus($trx_id);
+            if ($checkId) {
+                 $transaction = $this->checkTransactionStatus($checkId);
                  
-                 // 1=Success, 6=Paid/Settled
-                 if ($transaction && ($transaction['Status'] == 1 || $transaction['Status'] == 6)) { 
+                 // Check if payment is successful (Status 1, 6, 7/Escrow, or PaidStatus 'paid')
+                 if ($transaction && $ipaymu->isPaid($transaction)) { 
                      
                      $statusUpdated = false;
                      DB::transaction(function () use ($order, &$statusUpdated) {
                         // Double check agar tidak dobel update jika webhook ternyata masuk duluan
                         $freshOrder = Order::lockForUpdate()->find($order->id);
-                        if ($freshOrder->status === 'menunggu') {
+                        if ($freshOrder && $freshOrder->status === 'menunggu') {
                             $freshOrder->update(['status' => 'terkirim']);
                             if ($freshOrder->voucher) {
                                 $freshOrder->voucher->update(['status' => 'nonaktif', 'available' => 0]);
@@ -251,17 +251,22 @@ class PublicOrderController extends Controller
                     
                     // Email dikirim SETELAH transaksi DB selesai dan di-commit
                     if ($statusUpdated && $order->voucher) {
-                        Mail::to($order->email)->send(new VoucherCodeMail($order->voucher));
-                        Log::info('Order updated & Email sent via Return URL check', ['orderId' => $orderId]);
+                        try {
+                            Mail::to($order->email)->send(new VoucherCodeMail($order->voucher));
+                            Log::info('Order updated & Email sent via Return URL check', ['orderId' => $orderId]);
+                        } catch (\Exception $e) {
+                            Log::error('Failed to send Voucher Email via Return URL', [
+                                'orderId' => $orderId,
+                                'error' => $e->getMessage()
+                            ]);
+                        }
                     }
                     
                     // Redirect ke halaman sukses final
                     return redirect()->route('public.order.success', ['orderId' => $order->id]);
                  }
             } else {
-               // Fallback: Jika iPaymu melempar ke ReturnURL tapi TANPA trx_id, 
-               // Atau nge-blank. Kemungkinan user cancel atau close tab sebelum beres.
-               Log::warning('Return URL accessed without trx_id for pending order', [
+               Log::warning('Return URL accessed without trx_id or snap_token for pending order', [
                    'orderId' => $orderId,
                    'query' => $request->all()
                ]);
@@ -290,30 +295,41 @@ class PublicOrderController extends Controller
         ]);
 
         $order = Order::with(['paket', 'voucher'])->findOrFail($orderId);
+        $ipaymu = new \App\Services\IPaymuService();
 
         // Only update if still pending
         if ($order->status === 'menunggu') {
             // Verify payment status from iPaymu
             $trx_id = $request->input('trx_id');
+            $checkId = $trx_id ?: $order->snap_token;
             
-            if ($trx_id) {
-                $transaction = $this->checkTransactionStatus($trx_id);
+            if ($checkId) {
+                $transaction = $this->checkTransactionStatus($checkId);
                 
                 // Only update if payment is confirmed
-                if ($transaction && $transaction['Status'] == 1) {
+                if ($transaction && $ipaymu->isPaid($transaction)) {
                     $statusUpdated = false;
                     DB::transaction(function () use ($order, &$statusUpdated) {
-                        $order->update(['status' => 'terkirim']);
-                        if ($order->voucher) {
-                            $order->voucher->update(['status' => 'nonaktif', 'available' => 0]);
+                        $freshOrder = Order::lockForUpdate()->find($order->id);
+                        if ($freshOrder && $freshOrder->status === 'menunggu') {
+                            $freshOrder->update(['status' => 'terkirim']);
+                            if ($freshOrder->voucher) {
+                                $freshOrder->voucher->update(['status' => 'nonaktif', 'available' => 0]);
+                            }
+                            $statusUpdated = true;
                         }
-                        $statusUpdated = true;
                     });
                     
                     if ($statusUpdated && $order->voucher) {
-                        // Send email with voucher code in background
-                        Mail::to($order->email)->send(new VoucherCodeMail($order->voucher));
-                        Log::info('Order payment confirmed via Callback & Email queued', ['orderId' => $orderId]);
+                        try {
+                            Mail::to($order->email)->send(new VoucherCodeMail($order->voucher));
+                            Log::info('Order payment confirmed via Callback & Email sent', ['orderId' => $orderId]);
+                        } catch (\Exception $e) {
+                            Log::error('Failed to send Voucher Email via Callback', [
+                                'orderId' => $orderId,
+                                'error' => $e->getMessage()
+                            ]);
+                        }
                     }
                 }
             }

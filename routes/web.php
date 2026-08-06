@@ -55,6 +55,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::delete('/orders/delete-all', [OrderController::class, 'deleteAll'])->name('orders.deleteAll');
     Route::delete('/orders/destroy-selected', [OrderController::class, 'destroySelected'])->name('orders.destroySelected');
     Route::delete('/orders/destroy-by-filter', [OrderController::class, 'destroyByFilter'])->name('orders.destroyByFilter');
+    Route::post('/orders/{id}/confirm-manual', [OrderController::class, 'confirmManual'])->name('orders.confirmManual');
+    Route::post('/orders/{id}/sync-status', [OrderController::class, 'syncStatus'])->name('orders.syncStatus');
+    Route::get('/orders/{id}/check-ipaymu', [OrderController::class, 'checkIPaymuJson'])->name('orders.checkIPaymuJson');
     Route::resource('orders', OrderController::class);
 
 

@@ -209,27 +209,43 @@
                                                 </span>
                                             @endif
                                         </td>
-                                        <td class="px-4 py-3 text-end">
-                                            <div class="btn-group btn-group-sm">
-                                                <a href="{{ route('admin.orders.show', $order->id) }}" 
-                                                   class="btn btn-outline-info" title="Lihat Detail">
-                                                    <i class="fas fa-eye"></i>
-                                                </a>
-                                                <a href="{{ route('admin.orders.edit', $order->id) }}" 
-                                                   class="btn btn-outline-warning" title="Edit">
-                                                    <i class="fas fa-edit"></i>
-                                                </a>
-                                                <form action="{{ route('admin.orders.destroy', $order->id) }}" 
-                                                      method="POST" class="d-inline"
-                                                      onsubmit="return confirm('Yakin ingin menghapus order ini?')">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button class="btn btn-outline-danger" title="Hapus">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        </td>
+                                         <td class="px-4 py-3 text-end">
+                                             <div class="btn-group btn-group-sm">
+                                                 @if($order->status == 'menunggu' || $order->status == 'pending')
+                                                     @if($order->snap_token)
+                                                         <button type="button" 
+                                                                 class="btn btn-outline-primary btn-check-ipaymu" 
+                                                                 data-order-id="{{ $order->id }}"
+                                                                 title="Cek Status iPaymu (Live Modal)">
+                                                             <i class="fas fa-search-dollar"></i>
+                                                         </button>
+                                                     @endif
+                                                     <form action="{{ route('admin.orders.confirmManual', $order->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin mengonfirmasi Order #{{ $order->id }} secara manual dan langsung mengirim email voucher?')">
+                                                         @csrf
+                                                         <button type="submit" class="btn btn-success text-white" title="Konfirmasi Manual & Kirim Voucher">
+                                                             <i class="fas fa-check-double"></i>
+                                                         </button>
+                                                     </form>
+                                                 @endif
+                                                 <a href="{{ route('admin.orders.show', $order->id) }}" 
+                                                    class="btn btn-outline-info" title="Lihat Detail">
+                                                     <i class="fas fa-eye"></i>
+                                                 </a>
+                                                 <a href="{{ route('admin.orders.edit', $order->id) }}" 
+                                                    class="btn btn-outline-warning" title="Edit">
+                                                     <i class="fas fa-edit"></i>
+                                                 </a>
+                                                 <form action="{{ route('admin.orders.destroy', $order->id) }}" 
+                                                       method="POST" class="d-inline"
+                                                       onsubmit="return confirm('Yakin ingin menghapus order ini?')">
+                                                     @csrf
+                                                     @method('DELETE')
+                                                     <button class="btn btn-outline-danger" title="Hapus">
+                                                         <i class="fas fa-trash"></i>
+                                                     </button>
+                                                 </form>
+                                             </div>
+                                         </td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -253,6 +269,73 @@
         @endif
     </div>
 
+    <!-- Modal Status iPaymu (Live 2-Langkah) -->
+    <div class="modal fade" id="ipaymuStatusModal" tabindex="-1" aria-labelledby="ipaymuModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-header-title modal-title h6 fw-bold mb-0" id="ipaymuModalLabel">
+                        <i class="fas fa-receipt me-2 text-primary"></i>Detail Status iPaymu (Live)
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4" id="ipaymuModalBody">
+                    <div class="text-center py-4" id="ipaymuModalSpinner">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="text-muted small mt-2 mb-0">Menghubungkan ke API iPaymu...</p>
+                    </div>
+                    <div id="ipaymuModalContent" style="display: none;">
+                        <!-- Alert Status -->
+                        <div id="ipaymuStatusAlert" class="alert d-flex align-items-center p-3 mb-3" role="alert">
+                            <i id="ipaymuStatusIcon" class="fas fa-2x me-3"></i>
+                            <div>
+                                <div class="fw-bold" id="ipaymuStatusTitle">Status Pembayaran</div>
+                                <div class="small" id="ipaymuStatusSub">Keterangan iPaymu</div>
+                            </div>
+                        </div>
+
+                        <!-- Details Table -->
+                        <div class="card bg-light border-0 mb-3">
+                            <div class="card-body p-3">
+                                <div class="row g-2 small">
+                                    <div class="col-6 text-muted">Order ID:</div>
+                                    <div class="col-6 text-end fw-semibold" id="mOrderId">#0</div>
+                                    <div class="col-6 text-muted">Pelanggan:</div>
+                                    <div class="col-6 text-end fw-semibold" id="mBuyerName">-</div>
+                                    <div class="col-6 text-muted">Email:</div>
+                                    <div class="col-6 text-end fw-semibold" id="mBuyerEmail">-</div>
+                                    <div class="col-6 text-muted">Paket WiFi:</div>
+                                    <div class="col-6 text-end fw-semibold" id="mPaketNama">-</div>
+                                    <div class="col-6 text-muted">Nominal Total:</div>
+                                    <div class="col-6 text-end fw-bold text-primary" id="mAmount">Rp 0</div>
+                                    <div class="col-6 text-muted">Metode Bayar:</div>
+                                    <div class="col-6 text-end fw-semibold" id="mPaymentMethod">-</div>
+                                    <div class="col-6 text-muted">Transaction ID:</div>
+                                    <div class="col-6 text-end text-muted font-monospace" id="mTrxId">-</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="ipaymuHoldNotice" class="alert alert-warning small mb-0 d-none">
+                            <i class="fas fa-exclamation-triangle me-1"></i> Pembayaran di iPaymu belum lunas. Transaksi tetap berada di status <strong>Menunggu (Hold)</strong>.
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light border-0">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Tutup</button>
+                    <form id="confirmManualFormModal" action="" method="POST" class="d-inline">
+                        @csrf
+                        <button type="submit" id="btnConfirmInModal" class="btn btn-success btn-sm text-white d-none" onclick="return confirm('Konfirmasi order ini dan kirimkan email voucher ke pelanggan?')">
+                            <i class="fas fa-check-circle me-1"></i>Konfirmasi & Kirim Kode Voucher
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <style>
         .table tbody tr {
             transition: background-color 0.2s;
@@ -263,7 +346,6 @@
         .btn-group-sm .btn {
             padding: 0.375rem 0.75rem;
         }
-    </style>
     </style>
 </x-app-layout>
 
@@ -298,10 +380,85 @@
                 }
             });
         });
+
+        // Handle iPaymu Status Check Modal (2-Step)
+        const modalEl = document.getElementById('ipaymuStatusModal');
+        const modal = modalEl && typeof bootstrap !== 'undefined' ? new bootstrap.Modal(modalEl) : null;
+
+        document.querySelectorAll('.btn-check-ipaymu').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const orderId = this.getAttribute('data-order-id');
+                if (!orderId) return;
+
+                // Reset modal state
+                document.getElementById('ipaymuModalSpinner').style.display = 'block';
+                document.getElementById('ipaymuModalContent').style.display = 'none';
+                document.getElementById('btnConfirmInModal').classList.add('d-none');
+                document.getElementById('ipaymuHoldNotice').classList.add('d-none');
+
+                if (modal) modal.show();
+
+                fetch(`/admin/orders/${orderId}/check-ipaymu`, {
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('ipaymuModalSpinner').style.display = 'none';
+                    document.getElementById('ipaymuModalContent').style.display = 'block';
+
+                    if (data.success) {
+                        const isPaid = data.is_paid;
+                        const alertEl = document.getElementById('ipaymuStatusAlert');
+                        const iconEl = document.getElementById('ipaymuStatusIcon');
+                        const titleEl = document.getElementById('ipaymuStatusTitle');
+                        const subEl = document.getElementById('ipaymuStatusSub');
+                        const btnConfirm = document.getElementById('btnConfirmInModal');
+                        const holdNotice = document.getElementById('ipaymuHoldNotice');
+                        const formConfirm = document.getElementById('confirmManualFormModal');
+
+                        formConfirm.action = `/admin/orders/${orderId}/confirm-manual`;
+
+                        if (isPaid) {
+                            alertEl.className = 'alert alert-success d-flex align-items-center p-3 mb-3';
+                            iconEl.className = 'fas fa-check-circle fa-2x me-3 text-success';
+                            titleEl.innerText = 'LUNAS / BERHASIL';
+                            subEl.innerText = `Pembayaran terkonfirmasi di iPaymu (${data.status_desc})`;
+                            btnConfirm.classList.remove('d-none');
+                            holdNotice.classList.add('d-none');
+                        } else {
+                            alertEl.className = 'alert alert-warning d-flex align-items-center p-3 mb-3';
+                            iconEl.className = 'fas fa-clock fa-2x me-3 text-warning';
+                            titleEl.innerText = 'BELUM DIBAYAR';
+                            subEl.innerText = `Status iPaymu: ${data.status_desc}`;
+                            btnConfirm.classList.add('d-none');
+                            holdNotice.classList.remove('d-none');
+                        }
+
+                        document.getElementById('mOrderId').innerText = '#' + data.order.id;
+                        document.getElementById('mBuyerName').innerText = data.buyer_name || data.order.nama;
+                        document.getElementById('mBuyerEmail').innerText = data.buyer_email || data.order.email;
+                        document.getElementById('mPaketNama').innerText = data.order.paket;
+                        document.getElementById('mAmount').innerText = 'Rp ' + new Intl.NumberFormat('id-ID').format(data.amount);
+                        document.getElementById('mPaymentMethod').innerText = (data.payment_method || '-') + (data.payment_channel && data.payment_channel !== '-' ? ' (' + data.payment_channel + ')' : '');
+                        document.getElementById('mTrxId').innerText = data.transaction_id || '-';
+                    } else {
+                        alert('Gagal mengambil status: ' + data.message);
+                        if (modal) modal.hide();
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert('Terjadi kesalahan koneksi ke server.');
+                    if (modal) modal.hide();
+                });
+            });
+        });
     });
 
     function submitBulkDelete() {
-        // Collect checked IDs
         const checkboxes = document.querySelectorAll('.order-checkbox:checked');
         if (checkboxes.length === 0) {
             alert('Pilih setidaknya satu order untuk dihapus.');
@@ -313,10 +470,7 @@
         }
 
         const ids = Array.from(checkboxes).map(cb => cb.value);
-        
-        // Prepare hidden form
         const form = document.getElementById('bulkDeleteForm');
-        // Remove existing dynamic inputs
         form.querySelectorAll('input[name="order_ids[]"]').forEach(el => el.remove());
 
         ids.forEach(id => {

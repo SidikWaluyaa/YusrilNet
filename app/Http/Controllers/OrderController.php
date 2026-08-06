@@ -10,6 +10,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Services\IPaymuService;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
@@ -27,6 +29,201 @@ class OrderController extends Controller
             ->paginate(10); // Menggunakan pagination
 
         return view('orders.index', compact('orders', 'total_orders', 'total_selesai', 'total_pendapatan'));
+    }
+
+    /**
+     * Konfirmasi manual order oleh Admin
+     */
+    public function confirmManual($id)
+    {
+        $order = Order::with(['paket', 'voucher'])->findOrFail($id);
+
+        if ($order->status !== 'menunggu') {
+            return redirect()->back()->with('info', "Order #{$id} sudah diproses atau dibatalkan.");
+        }
+
+        $voucherAssigned = false;
+
+        DB::transaction(function () use ($order, &$voucherAssigned) {
+            $freshOrder = Order::lockForUpdate()->find($order->id);
+            if ($freshOrder->status !== 'menunggu') {
+                return;
+            }
+
+            // Jika order belum memiliki voucher, alokasikan voucher aktif yang tersedia
+            if (!$freshOrder->voucher_id) {
+                $availableVoucher = Voucher::where('paket_id', $freshOrder->paket_id)
+                    ->where('status', 'aktif')
+                    ->where('available', 1)
+                    ->lockForUpdate()
+                    ->first();
+
+                if ($availableVoucher) {
+                    $freshOrder->voucher_id = $availableVoucher->id;
+                    $availableVoucher->update(['status' => 'nonaktif', 'available' => 0]);
+                    $voucherAssigned = true;
+                }
+            } else {
+                if ($freshOrder->voucher) {
+                    $freshOrder->voucher->update(['status' => 'nonaktif', 'available' => 0]);
+                }
+                $voucherAssigned = true;
+            }
+
+            $freshOrder->update(['status' => 'terkirim']);
+        });
+
+        $order->refresh();
+
+        if ($order->status === 'terkirim') {
+            if ($order->voucher) {
+                try {
+                    Mail::to($order->email)->send(new VoucherCodeMail($order->voucher));
+                    Log::info("Order #{$order->id} manually confirmed by Admin ID: " . Auth::id() . " & Email sent.");
+                    return redirect()->back()->with('success', "Order #{$order->id} berhasil dikonfirmasi secara manual dan email voucher telah dikirim ke {$order->email}.");
+                } catch (\Exception $e) {
+                    Log::error("Order #{$order->id} manually confirmed, but email failed", ['error' => $e->getMessage()]);
+                    return redirect()->back()->with('warning', "Order #{$order->id} berhasil dikonfirmasi, namun gagal mengirimkan email: {$e->getMessage()}");
+                }
+            }
+            return redirect()->back()->with('success', "Order #{$order->id} berhasil dikonfirmasi secara manual.");
+        }
+
+        return redirect()->back()->with('error', "Gagal mengonfirmasi order #{$order->id}. Voucher tidak tersedia di sistem.");
+    }
+
+    /**
+     * Cek status live iPaymu dan kembalikan data JSON untuk Modal Admin
+     */
+    public function checkIPaymuJson($id)
+    {
+        $order = Order::with(['paket', 'voucher'])->findOrFail($id);
+
+        if (!$order->snap_token) {
+            return response()->json([
+                'success' => false,
+                'message' => "Order #{$order->id} tidak memiliki Session ID / Snap Token iPaymu."
+            ], 400);
+        }
+
+        $ipaymu = new IPaymuService();
+        $transaction = $ipaymu->checkTransactionStatus($order->snap_token);
+
+        // Jika iPaymu mengembalikan null (misal: buyer belum memilih metode bayar di iPaymu)
+        if (!$transaction) {
+            return response()->json([
+                'success' => true,
+                'is_paid' => false,
+                'status_desc' => 'Belum Dibayar / Sesi Belum Diproses Pembeli',
+                'transaction_id' => '-',
+                'reference_id' => (string)$order->id,
+                'amount' => $order->harga,
+                'subtotal' => $order->harga,
+                'fee' => 0,
+                'payment_method' => '-',
+                'payment_channel' => '-',
+                'buyer_name' => $order->nama,
+                'buyer_email' => $order->email,
+                'created_date' => $order->created_at->format('Y-m-d H:i:s'),
+                'paid_date' => null,
+                'order' => [
+                    'id' => $order->id,
+                    'nama' => $order->nama,
+                    'email' => $order->email,
+                    'paket' => $order->paket->nama ?? '-',
+                    'harga' => $order->harga,
+                    'status' => $order->status,
+                    'has_voucher' => !empty($order->voucher_id),
+                ]
+            ]);
+        }
+
+        $isPaid = $ipaymu->isPaid($transaction);
+        $statusDesc = $transaction['StatusDesc'] ?? ($isPaid ? 'BERHASIL' : 'BELUM DIBAYAR');
+
+        return response()->json([
+            'success' => true,
+            'is_paid' => $isPaid,
+            'status_desc' => $statusDesc,
+            'transaction_id' => $transaction['TransactionId'] ?? null,
+            'reference_id' => $transaction['ReferenceId'] ?? null,
+            'amount' => $transaction['Amount'] ?? $order->harga,
+            'subtotal' => $transaction['SubTotal'] ?? $order->harga,
+            'fee' => $transaction['Fee'] ?? 0,
+            'payment_method' => $transaction['PaymentMethod'] ?? ($transaction['TypeDesc'] ?? '-'),
+            'payment_channel' => $transaction['PaymentChannel'] ?? '-',
+            'buyer_name' => $transaction['BuyerName'] ?? $order->nama,
+            'buyer_email' => $transaction['BuyerEmail'] ?? $order->email,
+            'created_date' => $transaction['CreatedDate'] ?? null,
+            'paid_date' => $transaction['SuccessDate'] ?? null,
+            'order' => [
+                'id' => $order->id,
+                'nama' => $order->nama,
+                'email' => $order->email,
+                'paket' => $order->paket->nama ?? '-',
+                'harga' => $order->harga,
+                'status' => $order->status,
+                'has_voucher' => !empty($order->voucher_id),
+            ]
+        ]);
+    }
+
+    /**
+     * Cek status live ke API iPaymu untuk order tertentu
+     */
+    public function syncStatus($id)
+    {
+        $order = Order::with(['paket', 'voucher'])->findOrFail($id);
+
+        if (!$order->snap_token) {
+            return redirect()->back()->with('error', "Order #{$order->id} tidak memiliki Session ID / Snap Token iPaymu.");
+        }
+
+        $ipaymu = new IPaymuService();
+        $transaction = $ipaymu->checkTransactionStatus($order->snap_token);
+
+        if ($transaction && $ipaymu->isPaid($transaction)) {
+            $statusUpdated = false;
+
+            DB::transaction(function () use ($order, &$statusUpdated) {
+                $freshOrder = Order::lockForUpdate()->find($order->id);
+                if ($freshOrder && $freshOrder->status === 'menunggu') {
+                    if (!$freshOrder->voucher_id) {
+                        $availableVoucher = Voucher::where('paket_id', $freshOrder->paket_id)
+                            ->where('status', 'aktif')
+                            ->where('available', 1)
+                            ->lockForUpdate()
+                            ->first();
+
+                        if ($availableVoucher) {
+                            $freshOrder->voucher_id = $availableVoucher->id;
+                            $availableVoucher->update(['status' => 'nonaktif', 'available' => 0]);
+                        }
+                    } else if ($freshOrder->voucher) {
+                        $freshOrder->voucher->update(['status' => 'nonaktif', 'available' => 0]);
+                    }
+
+                    $freshOrder->update(['status' => 'terkirim']);
+                    $statusUpdated = true;
+                }
+            });
+
+            $order->refresh();
+
+            if ($statusUpdated && $order->voucher) {
+                try {
+                    Mail::to($order->email)->send(new VoucherCodeMail($order->voucher));
+                    Log::info("Order #{$order->id} auto-synced via Admin Live Check & Email sent.");
+                } catch (\Exception $e) {
+                    Log::error("Order #{$order->id} synced, but mail failed", ['error' => $e->getMessage()]);
+                }
+            }
+
+            return redirect()->back()->with('success', "Live Check iPaymu: Order #{$order->id} terdeteksi LUNAS! Status diperbarui ke Terkirim & email voucher dikirim.");
+        }
+
+        $statusDesc = $transaction['StatusDesc'] ?? 'Belum Dibayar';
+        return redirect()->back()->with('info', "Live Check iPaymu: Order #{$order->id} berstatus '{$statusDesc}' di iPaymu.");
     }
 
     /**
