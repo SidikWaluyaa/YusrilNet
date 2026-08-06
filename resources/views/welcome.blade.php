@@ -29,11 +29,16 @@
             --text-muted: #64748b;
         }
 
+        html, body {
+            overflow-x: hidden !important;
+            max-width: 100% !important;
+            width: 100%;
+        }
+
         body {
             font-family: 'Outfit', sans-serif;
             color: var(--text-main);
             background-color: var(--light-bg);
-            overflow-x: hidden;
             line-height: 1.6;
         }
 
@@ -1036,11 +1041,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
-        // Init AOS
+        // Init AOS (disabled on mobile to prevent horizontal page overflow/shifting)
         AOS.init({
             duration: 800,
             once: true,
-            offset: 100
+            offset: 50,
+            disable: 'mobile'
         });
 
         // Navbar active link highlight on scroll

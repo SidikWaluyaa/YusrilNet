@@ -406,7 +406,8 @@
         AOS.init({
             duration: 800,
             once: true,
-            offset: 100
+            offset: 50,
+            disable: 'mobile'
         });
     </script>
 </body>
