@@ -31,8 +31,11 @@
 
         html, body {
             overflow-x: hidden !important;
-            max-width: 100% !important;
-            width: 100%;
+            max-width: 100vw !important;
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            position: relative;
         }
 
         body {
@@ -40,6 +43,21 @@
             color: var(--text-main);
             background-color: var(--light-bg);
             line-height: 1.6;
+        }
+
+        /* Prevent offscreen AOS animations from causing horizontal scroll on mobile */
+        @media (max-width: 991.98px) {
+            html, body {
+                overflow-x: hidden !important;
+            }
+            [data-aos], [data-aos="fade-left"], [data-aos="fade-right"], [data-aos="fade-up"] {
+                opacity: 1 !important;
+                transform: none !important;
+                transition: none !important;
+            }
+            .container {
+                overflow-x: hidden;
+            }
         }
 
         h1, h2, h3, h4, h5, h6, .font-poppins {
@@ -513,7 +531,7 @@
 
         /* Floating WhatsApp Button */
         .floating-wa-btn {
-            position: fixed;
+            position: fixed !important;
             bottom: 25px;
             right: 25px;
             width: 58px;
@@ -526,7 +544,7 @@
             justify-content: center;
             font-size: 30px;
             box-shadow: 0 8px 22px rgba(37, 211, 102, 0.45);
-            z-index: 9999;
+            z-index: 2147483647 !important;
             transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             text-decoration: none;
             animation: waPulse 2.2s infinite;
