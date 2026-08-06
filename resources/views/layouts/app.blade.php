@@ -6,6 +6,14 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>YusrilNet - Admin Panel</title>
     
+    <!-- Script pencegah FOUC untuk restore UI Scale -->
+    <script>
+        (function() {
+            const savedScale = localStorage.getItem('yusrilnet_ui_scale') || 'normal';
+            document.documentElement.classList.add('scale-' + savedScale);
+        })();
+    </script>
+
     <!-- PWA Primary Meta Tags -->
     <meta name="theme-color" content="#4361ee">
     <meta name="mobile-web-app-capable" content="yes">
@@ -31,10 +39,15 @@
             --success: #06d6a0;
             --warning: #ffd60a;
             --danger: #ef476f;
-            --sidebar-width: 260px;
-            --topbar-height: 65px;
-            --bottom-nav-height: 64px;
+            --sidebar-width: 250px;
+            --topbar-height: 60px;
+            --bottom-nav-height: 60px;
         }
+
+        /* Scale Presets (Pengatur Ukuran Tampilan) */
+        html.scale-compact { font-size: 81.25% !important; } /* ~13px */
+        html.scale-normal  { font-size: 87.5% !important; }  /* ~14px - Default Mobile */
+        html.scale-large   { font-size: 93.75% !important; } /* ~15px */
 
         * {
             margin: 0;
@@ -57,21 +70,21 @@
             left: var(--sidebar-width);
             right: 0;
             height: var(--topbar-height);
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.92);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border-bottom: 1px solid rgba(0,0,0,0.06);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 1.5rem;
+            padding: 0 1.25rem;
             z-index: 999;
             transition: left 0.3s ease;
         }
 
         .topbar-brand {
             font-family: 'Poppins', sans-serif;
-            font-size: 1.15rem;
+            font-size: 1.1rem;
             font-weight: 700;
             color: var(--neptune-dark);
             display: flex;
@@ -80,8 +93,8 @@
         }
 
         .user-avatar {
-            width: 38px;
-            height: 38px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             background: linear-gradient(135deg, var(--neptune-blue), var(--neptune-dark));
             color: white;
@@ -89,7 +102,7 @@
             align-items: center;
             justify-content: center;
             font-weight: 700;
-            font-size: 0.9rem;
+            font-size: 0.88rem;
             box-shadow: 0 2px 8px rgba(67, 97, 238, 0.25);
         }
 
@@ -109,27 +122,27 @@
         }
 
         .sidebar-brand {
-            padding: 1.25rem 1.5rem;
+            padding: 1.1rem 1.25rem;
             font-family: 'Poppins', sans-serif;
-            font-size: 1.35rem;
+            font-size: 1.25rem;
             font-weight: 800;
             display: flex;
             align-items: center;
-            gap: 0.75rem;
+            gap: 0.65rem;
             border-bottom: 1px solid rgba(255,255,255,0.1);
         }
 
         .sidebar-menu {
-            padding: 1rem 0;
+            padding: 0.75rem 0;
         }
 
         .menu-item {
             display: flex;
             align-items: center;
-            padding: 0.85rem 1.5rem;
+            padding: 0.75rem 1.25rem;
             color: rgba(255,255,255,0.85);
             text-decoration: none;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             font-weight: 500;
             transition: all 0.2s ease;
             border-left: 4px solid transparent;
@@ -149,16 +162,16 @@
         }
 
         .menu-item i {
-            width: 22px;
-            font-size: 1.1rem;
-            margin-right: 0.85rem;
+            width: 20px;
+            font-size: 1.05rem;
+            margin-right: 0.75rem;
         }
 
         /* Main Content Container */
         .main-content {
             margin-left: var(--sidebar-width);
             margin-top: var(--topbar-height);
-            padding: 1.75rem;
+            padding: 1.5rem;
             min-height: calc(100vh - var(--topbar-height));
             transition: margin-left 0.3s ease;
         }
@@ -194,7 +207,7 @@
             justify-content: center;
             color: #718096;
             text-decoration: none;
-            font-size: 0.68rem;
+            font-size: 0.65rem;
             font-weight: 500;
             width: 20%;
             height: 100%;
@@ -203,7 +216,7 @@
         }
 
         .mobile-nav-link i {
-            font-size: 1.25rem;
+            font-size: 1.15rem;
             margin-bottom: 2px;
             transition: transform 0.2s ease;
         }
@@ -221,13 +234,13 @@
             content: '';
             position: absolute;
             top: 0;
-            width: 32px;
+            width: 28px;
             height: 3px;
             background: var(--neptune-blue);
             border-radius: 0 0 4px 4px;
         }
 
-        /* Mobile Responsive Adjustments */
+        /* Mobile Responsive Adjustments (High Density Compact) */
         @media (max-width: 767.98px) {
             .sidebar {
                 transform: translateX(-100%);
@@ -239,13 +252,13 @@
 
             .topbar {
                 left: 0;
-                padding: 0 1rem;
+                padding: 0 0.85rem;
             }
 
             .main-content {
                 margin-left: 0;
-                padding: 1.25rem 0.85rem;
-                padding-bottom: calc(var(--bottom-nav-height) + 1.5rem);
+                padding: 0.85rem 0.65rem;
+                padding-bottom: calc(var(--bottom-nav-height) + 1.25rem);
             }
 
             .mobile-bottom-nav {
@@ -255,6 +268,29 @@
             .sidebar-toggle-btn {
                 display: flex !important;
             }
+
+            /* Compact card padding & spacing on mobile */
+            .card-body {
+                padding: 0.85rem !important;
+            }
+            .card-header {
+                padding: 0.75rem 0.85rem !important;
+            }
+            .container-fluid {
+                padding-left: 0.25rem !important;
+                padding-right: 0.25rem !important;
+            }
+            .row {
+                --bs-gutter-x: 0.5rem;
+                --bs-gutter-y: 0.5rem;
+            }
+            .h1, h1 { font-size: 1.35rem !important; }
+            .h2, h2 { font-size: 1.2rem !important; }
+            .h3, h3 { font-size: 1.1rem !important; }
+            .h4, h4 { font-size: 1.0rem !important; }
+            .h5, h5 { font-size: 0.92rem !important; }
+            .h6, h6 { font-size: 0.85rem !important; }
+            p { margin-bottom: 0.5rem; }
         }
 
         /* Micro Animations */
@@ -271,12 +307,18 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.12);
             border-radius: 12px;
             padding: 0.5rem;
+            font-size: 0.9rem;
         }
 
         .dropdown-item {
             border-radius: 8px;
-            padding: 0.6rem 1rem;
-            font-size: 0.9rem;
+            padding: 0.5rem 0.85rem;
+        }
+
+        .ui-scale-btn-group .btn {
+            font-size: 0.72rem;
+            padding: 0.25rem 0.5rem;
+            font-weight: 600;
         }
     </style>
 </head>
@@ -313,11 +355,11 @@
     <!-- Topbar Header -->
     <header class="topbar">
         <div class="d-flex align-items-center">
-            <button class="btn btn-light btn-sm me-2 d-none sidebar-toggle-btn border-0" id="sidebarToggle" style="width: 38px; height: 38px; border-radius: 10px;">
+            <button class="btn btn-light btn-sm me-2 d-none sidebar-toggle-btn border-0" id="sidebarToggle" style="width: 36px; height: 36px; border-radius: 10px;">
                 <i class="fas fa-bars text-dark"></i>
             </button>
             <div class="topbar-brand">
-                <img src="{{ asset('Logo.png') }}" alt="Logo" style="height: 28px; width: auto;" class="d-md-none">
+                <img src="{{ asset('Logo.png') }}" alt="Logo" style="height: 26px; width: auto;" class="d-md-none">
                 <span>Admin Panel</span>
             </div>
         </div>
@@ -331,17 +373,30 @@
                             {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
                         </div>
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2" style="min-width: 220px;">
                         <li class="px-3 py-2 border-bottom d-md-none">
                             <div class="fw-bold">{{ auth()->user()->name }}</div>
                             <div class="text-muted small">{{ auth()->user()->email }}</div>
                         </li>
+                        
+                        <!-- UI Scale / Font Size Selector -->
+                        <li class="px-3 py-2 border-bottom bg-light rounded-2 mx-1 my-1">
+                            <div class="text-muted extra-small fw-bold mb-1 text-uppercase" style="font-size: 0.68rem; letter-spacing: 0.5px;">
+                                <i class="fas fa-text-height me-1 text-primary"></i>Ukuran Tampilan (Scale)
+                            </div>
+                            <div class="btn-group btn-group-sm w-100 ui-scale-btn-group" role="group">
+                                <button type="button" class="btn btn-outline-primary btn-scale-set" data-scale="compact">Kecil</button>
+                                <button type="button" class="btn btn-outline-primary btn-scale-set" data-scale="normal">Sedang</button>
+                                <button type="button" class="btn btn-outline-primary btn-scale-set" data-scale="large">Besar</button>
+                            </div>
+                        </li>
+
                         <li>
                             <a class="dropdown-item" href="{{ route('profile.edit') }}">
                                 <i class="fas fa-user-circle me-2 text-primary"></i>Pengaturan Profil
                             </a>
                         </li>
-                        <li><hr class="dropdown-divider"></li>
+                        <li><hr class="dropdown-divider my-1"></li>
                         <li>
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
@@ -408,6 +463,41 @@
                     sidebar.classList.remove('show');
                 }
             }
+        });
+
+        // UI Scale Switcher (Kecil, Sedang, Besar)
+        function setUIScale(scaleName) {
+            const html = document.documentElement;
+            html.classList.remove('scale-compact', 'scale-normal', 'scale-large');
+            html.classList.add('scale-' + scaleName);
+            localStorage.setItem('yusrilnet_ui_scale', scaleName);
+            updateScaleButtons(scaleName);
+        }
+
+        function updateScaleButtons(currentScale) {
+            document.querySelectorAll('.btn-scale-set').forEach(btn => {
+                const btnScale = btn.getAttribute('data-scale');
+                if (btnScale === currentScale) {
+                    btn.classList.remove('btn-outline-primary');
+                    btn.classList.add('btn-primary', 'active');
+                } else {
+                    btn.classList.remove('btn-primary', 'active');
+                    btn.classList.add('btn-outline-primary');
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentScale = localStorage.getItem('yusrilnet_ui_scale') || 'normal';
+            updateScaleButtons(currentScale);
+
+            document.querySelectorAll('.btn-scale-set').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const scale = this.getAttribute('data-scale');
+                    setUIScale(scale);
+                });
+            });
         });
 
         // PWA Service Worker Registration
