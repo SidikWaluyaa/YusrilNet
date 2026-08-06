@@ -588,6 +588,18 @@
             }
         }
 
+        /* Mobile CSS overrides for AOS & Floating WA */
+        @media (max-width: 991.98px) {
+            [data-aos] {
+                opacity: 1 !important;
+                transform: none !important;
+                transition: none !important;
+            }
+            .wa-tooltip {
+                display: none !important;
+            }
+        }
+
         @media (max-width: 576px) {
             #home {
                 padding-top: 100px;
@@ -607,22 +619,26 @@
                 font-size: 1.85rem !important;
             }
             .floating-wa-btn {
-                bottom: 18px;
-                right: 18px;
-                width: 52px;
-                height: 52px;
-                font-size: 26px;
-            }
-            .wa-tooltip {
-                font-size: 0.75rem;
-                padding: 4px 10px;
-                right: 60px;
+                bottom: 20px !important;
+                right: 20px !important;
+                width: 52px !important;
+                height: 52px !important;
+                font-size: 26px !important;
             }
         }
     </style>
 </head>
 
 <body>
+
+    <!-- Floating WhatsApp Button (Fixed Top-Level Body Child) -->
+    <a href="https://wa.me/62895343565099?text=Halo%20Admin%20YusrilNet,%20saya%20butuh%20bantuan%20terkait%20voucher%20WiFi" 
+       target="_blank" 
+       class="floating-wa-btn" 
+       title="Chat CS Kami">
+        <span class="wa-tooltip">Chat CS Kami</span>
+        <i class="fab fa-whatsapp"></i>
+    </a>
 
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg fixed-top">
@@ -946,15 +962,6 @@
             </div>
         </div>
     </footer>
-
-    <!-- Floating WhatsApp Button -->
-    <a href="https://wa.me/62895343565099?text=Halo%20Admin%20YusrilNet,%20saya%20butuh%20bantuan%20terkait%20voucher%20WiFi" 
-       target="_blank" 
-       class="floating-wa-btn" 
-       title="Chat CS Kami">
-        <span class="wa-tooltip">Chat CS Kami</span>
-        <i class="fab fa-whatsapp"></i>
-    </a>
 
     <!-- Modals -->
     <!-- Terms Modal -->
