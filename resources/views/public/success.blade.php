@@ -78,6 +78,12 @@
 
                     <!-- Action Buttons -->
                     <div class="d-grid gap-2" data-aos="fade-up" data-aos-delay="600">
+                        @php
+                            $waMessage = "Halo Admin YusrilNet, pembayaran saya telah berhasil! Mohon verifikasi voucher WiFi saya:%0A- Order ID: YNET-" . $order->id . "%0A- Paket: " . urlencode($order->paket->nama) . "%0A- Username: " . urlencode($order->voucher->username ?? '-') . "%0A- Password: " . urlencode($order->voucher->password ?? '-');
+                        @endphp
+                        <a href="https://wa.me/62895343565099?text={{ $waMessage }}" target="_blank" class="btn btn-success btn-lg text-white font-semibold">
+                            <i class="fab fa-whatsapp me-2"></i>Kirim Kode ke WhatsApp CS
+                        </a>
                         <a href="{{ route('welcome') }}" class="btn btn-outline-primary btn-lg">
                             <i class="fas fa-home me-2"></i>Kembali ke Halaman Utama
                         </a>

@@ -42,14 +42,23 @@
                     <!-- Voucher Code -->
                     @if($order->voucher)
                     <div class="alert alert-primary text-center py-4 mb-4" role="alert">
-                        <h5 class="alert-heading fw-bold mb-3">Kode Voucher Anda</h5>
-                        <div class="bg-white rounded p-3 border border-primary border-2 d-inline-block shadow-sm">
-                            <h2 class="mb-0 fw-bold text-primary tracking-wider font-monospace">
-                                {{ $order->voucher->code }}
-                            </h2>
+                        <h5 class="alert-heading fw-bold mb-3"><i class="fas fa-ticket me-2"></i>Kredensial Voucher Anda</h5>
+                        <div class="row g-2 justify-content-center">
+                            <div class="col-6">
+                                <div class="bg-white rounded p-2 border border-primary border-2 shadow-sm">
+                                    <small class="text-muted d-block font-bold">USERNAME</small>
+                                    <h4 class="mb-0 fw-bold text-dark font-monospace">{{ $order->voucher->username ?? '-' }}</h4>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="bg-white rounded p-2 border border-primary border-2 shadow-sm">
+                                    <small class="text-muted d-block font-bold">PASSWORD</small>
+                                    <h4 class="mb-0 fw-bold text-primary font-monospace">{{ $order->voucher->password ?? '-' }}</h4>
+                                </div>
+                            </div>
                         </div>
                         <p class="small text-muted mt-3 mb-0">
-                            Kode voucher juga telah dikirim ke email: <strong>{{ $order->email }}</strong>
+                            Salinan voucher juga dikirim ke email: <strong>{{ $order->email }}</strong>
                         </p>
                     </div>
                     @endif
