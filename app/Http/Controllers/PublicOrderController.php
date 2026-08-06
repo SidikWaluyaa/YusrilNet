@@ -252,7 +252,7 @@ class PublicOrderController extends Controller
                     // Email dikirim SETELAH transaksi DB selesai dan di-commit
                     if ($statusUpdated && $order->voucher) {
                         try {
-                            Mail::to($order->email)->send(new VoucherCodeMail($order->voucher));
+                            Mail::to($order->email)->send(new VoucherCodeMail($order->voucher, $order));
                             Log::info('Order updated & Email sent via Return URL check', ['orderId' => $orderId]);
                         } catch (\Exception $e) {
                             Log::error('Failed to send Voucher Email via Return URL', [
@@ -324,7 +324,7 @@ class PublicOrderController extends Controller
                     
                     if ($statusUpdated && $order->voucher) {
                         try {
-                            Mail::to($order->email)->send(new VoucherCodeMail($order->voucher));
+                            Mail::to($order->email)->send(new VoucherCodeMail($order->voucher, $order));
                             Log::info('Order payment confirmed via Callback & Email sent', ['orderId' => $orderId]);
                         } catch (\Exception $e) {
                             Log::error('Failed to send Voucher Email via Callback', [

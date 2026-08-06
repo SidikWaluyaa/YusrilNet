@@ -78,7 +78,7 @@ class OrderController extends Controller
         if ($order->status === 'terkirim') {
             if ($order->voucher) {
                 try {
-                    Mail::to($order->email)->send(new VoucherCodeMail($order->voucher));
+                    Mail::to($order->email)->send(new VoucherCodeMail($order->voucher, $order));
                     Log::info("Order #{$order->id} manually confirmed by Admin ID: " . Auth::id() . " & Email sent.");
                     return redirect()->back()->with('success', "Order #{$order->id} berhasil dikonfirmasi secara manual dan email voucher telah dikirim ke {$order->email}.");
                 } catch (\Exception $e) {

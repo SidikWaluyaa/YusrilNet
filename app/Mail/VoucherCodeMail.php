@@ -3,10 +3,7 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
-use Illuminate\Mail\Mailables\Content;
-use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
 class VoucherCodeMail extends Mailable
@@ -14,15 +11,18 @@ class VoucherCodeMail extends Mailable
     use Queueable, SerializesModels;
 
     public $voucher;
+    public $order;
 
-    public function __construct($voucher)
+    public function __construct($voucher, $order = null)
     {
         $this->voucher = $voucher;
+        $this->order = $order ?? ($voucher ? $voucher->order : null);
     }
 
     public function build()
     {
-        return $this->subject('Kode Voucher Anda dari YusrilNet')
+        $paketNama = $this->voucher->nama ?? ($this->voucher->paket->nama ?? 'WiFi YusrilNet');
+        return $this->subject('Kode Voucher WiFi Anda - ' . $paketNama)
                     ->view('emails.voucher');
     }
 }
