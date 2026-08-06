@@ -291,7 +291,9 @@ class PublicOrderController extends Controller
         // Log callback for debugging
         Log::info('=== iPaymu Callback Received ===', [
             'orderId' => $orderId,
-            'request_data' => $request->all(),
+            'request_all' => $request->all(),
+            'json' => $request->json()->all(),
+            'content_type' => $request->header('Content-Type'),
         ]);
 
         $order = Order::with(['paket', 'voucher'])->findOrFail($orderId);
@@ -299,8 +301,8 @@ class PublicOrderController extends Controller
 
         // Only update if still pending
         if ($order->status === 'menunggu') {
-            // Verify payment status from iPaymu
-            $trx_id = $request->input('trx_id');
+            // Verify payment status from iPaymu (support form-urlencoded and JSON)
+            $trx_id = $request->input('trx_id') ?: ($request->json('trx_id') ?: null);
             $checkId = $trx_id ?: $order->snap_token;
             
             if ($checkId) {
