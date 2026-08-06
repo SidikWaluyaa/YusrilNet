@@ -6,11 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Yusril Net - Penyedia Voucher WiFi Terpercaya</title>
 
-    <!-- Fonts -->
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
 
     <!-- Icons & CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
@@ -18,548 +17,536 @@
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
     <link rel="shortcut icon" href="{{ asset('Logo.png') }}" type="image/x-icon">
+
     <style>
         :root {
-            --primary: #4361ee;
-            --secondary: #3f37c9;
-            --accent: #4895ef;
-            --success: #06d6a0;
-            --dark: #1e293b;
-            --light: #f8f9fa;
-            --gradient: linear-gradient(135deg, #4361ee 0%, #4cc9f0 100%);
-            --gradient-hover: linear-gradient(135deg, #3a0ca3 0%, #4361ee 100%);
-            --glass: rgba(255, 255, 255, 0.95);
-            --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 10px 15px -3px rgba(67, 97, 238, 0.1);
-            --shadow-lg: 0 20px 25px -5px rgba(67, 97, 238, 0.15);
+            --primary-blue: #1865f2;
+            --primary-dark: #0f3cb3;
+            --cyan-accent: #00d2ff;
+            --dark-bg: #06101e;
+            --light-bg: #f5f8ff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
         }
 
         body {
             font-family: 'Outfit', sans-serif;
-            color: var(--dark);
-            background-color: #f3f6fc;
+            color: var(--text-main);
+            background-color: var(--light-bg);
             overflow-x: hidden;
-            line-height: 1.7;
+            line-height: 1.6;
+        }
+
+        h1, h2, h3, h4, h5, h6, .font-poppins {
+            font-family: 'Poppins', sans-serif;
         }
 
         /* Navbar */
         .navbar {
-            padding: 15px 0;
-            background: rgba(255, 255, 255, 0.9) !important;
-            backdrop-filter: blur(10px);
-            box-shadow: var(--shadow-sm);
+            padding: 14px 0;
+            background: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
             transition: all 0.3s ease;
         }
 
         .navbar-brand {
             font-weight: 800;
-            font-size: 1.8rem;
-            color: var(--primary) !important;
-            letter-spacing: -0.5px;
+            font-size: 1.65rem;
+            color: var(--primary-blue) !important;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
-        .navbar-brand span {
-            color: var(--secondary);
+        .navbar-brand img {
+            height: 32px;
+            width: auto;
         }
 
         .nav-link {
             font-weight: 600;
-            color: var(--dark) !important;
-            margin: 0 5px;
-            padding: 8px 16px !important;
+            font-size: 0.95rem;
+            color: #475569 !important;
+            margin: 0 8px;
+            padding: 8px 12px !important;
+            transition: all 0.25s ease;
+            position: relative;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-blue) !important;
+        }
+
+        .nav-link.active {
+            color: var(--primary-blue) !important;
+            font-weight: 700;
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 24px;
+            height: 3px;
+            background: var(--primary-blue);
+            border-radius: 4px;
+        }
+
+        .btn-nav-buy {
+            background-color: var(--primary-blue);
+            color: white !important;
+            font-weight: 700;
+            padding: 10px 24px;
             border-radius: 50px;
+            box-shadow: 0 4px 14px rgba(24, 101, 242, 0.3);
             transition: all 0.3s ease;
         }
 
-        .nav-link:hover,
-        .nav-link.active {
-            color: var(--primary) !important;
-            background: rgba(67, 97, 238, 0.05);
+        .btn-nav-buy:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(24, 101, 242, 0.4);
         }
 
         /* Hero Section */
         #home {
-            background: linear-gradient(rgba(15, 23, 42, 0.7), rgba(15, 23, 42, 0.6)), url('gedung1.jpg');
+            background: linear-gradient(rgba(6, 16, 30, 0.75), rgba(6, 16, 30, 0.75)), url('{{ asset("images/hero_wifi_city.png") }}');
             background-size: cover;
             background-position: center;
-            background-attachment: fixed;
-            min-height: 100vh;
+            min-height: 85vh;
             display: flex;
             align-items: center;
             position: relative;
-            padding-top: 80px;
-        }
-
-        .hero-content {
-            text-align: center;
+            padding: 120px 0 80px;
             color: white;
-            padding: 20px;
         }
 
-        .hero-content h1 {
-            font-size: clamp(2rem, 5vw, 3.5rem);
+        .hero-badge {
+            font-size: 0.78rem;
+            letter-spacing: 1.5px;
+            color: var(--cyan-accent);
             font-weight: 800;
-            margin-bottom: 1.5rem;
-            line-height: 1.2;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            text-transform: uppercase;
+            margin-bottom: 12px;
         }
 
-        .hero-content p {
-            font-size: 1.25rem;
-            margin-bottom: 2.5rem;
-            opacity: 0.9;
-            max-width: 700px;
-            margin-left: auto;
-            margin-right: auto;
+        .hero-title {
+            font-size: clamp(2.2rem, 5.5vw, 3.8rem);
+            font-weight: 800;
+            line-height: 1.15;
+            margin-bottom: 20px;
         }
 
-        .hero-btn {
-            background: var(--gradient);
+        .hero-title span {
+            color: var(--cyan-accent);
+        }
+
+        .hero-desc {
+            font-size: 1.05rem;
+            color: rgba(255, 255, 255, 0.85);
+            max-width: 580px;
+            margin-bottom: 28px;
+        }
+
+        .hero-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 35px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .hero-features div {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-hero-cta {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--cyan-accent) 100%);
             color: white !important;
-            padding: 16px 45px;
-            border-radius: 50px;
             font-weight: 700;
-            font-size: 1.1rem;
+            font-size: 1.05rem;
+            padding: 14px 34px;
+            border-radius: 50px;
             border: none;
-            box-shadow: 0 10px 25px rgba(67, 97, 238, 0.4);
+            box-shadow: 0 10px 25px rgba(0, 210, 255, 0.35);
             transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
-            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        .hero-btn:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 35px rgba(67, 97, 238, 0.5);
-            background: var(--gradient-hover);
+        .btn-hero-cta:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 14px 30px rgba(0, 210, 255, 0.45);
         }
 
-        /* Section Styles */
-        section {
-            padding: 100px 0;
-            position: relative;
-        }
-
-        .section-title {
+        /* Section Global Titles */
+        .section-header {
             text-align: center;
-            margin-bottom: 60px;
+            margin-bottom: 45px;
         }
 
-        .section-title h2 {
-            font-size: 2.5rem;
+        .section-header h2 {
             font-weight: 800;
-            color: var(--dark);
-            margin-bottom: 15px;
-            display: inline-block;
-            position: relative;
+            font-size: 2.1rem;
+            color: var(--text-main);
+            margin-bottom: 8px;
         }
 
-        .section-title h2::after {
-            content: '';
-            display: block;
-            width: 80px;
-            height: 6px;
-            background: var(--gradient);
-            margin: 15px auto 0;
-            border-radius: 10px;
+        .section-header-line {
+            width: 45px;
+            height: 4px;
+            background: var(--primary-blue);
+            border-radius: 4px;
+            margin: 0 auto;
         }
 
-        /* Cards */
-        .service-card,
-        .pricing-card {
+        /* Paket Voucher Section */
+        #voucher {
+            padding: 90px 0;
+            background-color: white;
+        }
+
+        .voucher-card {
             background: white;
-            border-radius: 25px;
-            padding: 40px 30px;
-            border: 1px solid rgba(0, 0, 0, 0.03);
-            box-shadow: var(--shadow-sm);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            height: 100%;
-            position: relative;
-            overflow: hidden;
-            z-index: 1;
-        }
-
-        .service-card:hover,
-        .pricing-card:hover {
-            transform: translateY(-10px);
-            box-shadow: var(--shadow-md);
-            border-color: transparent;
-        }
-
-        .service-icon {
-            width: 80px;
-            height: 80px;
-            background: rgba(67, 97, 238, 0.1);
-            color: var(--primary);
+            border: 1.5px solid #e2e8f0;
             border-radius: 20px;
+            padding: 24px;
+            position: relative;
+            transition: all 0.3s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .voucher-card:hover {
+            border-color: var(--primary-blue);
+            transform: translateY(-6px);
+            box-shadow: 0 14px 30px rgba(24, 101, 242, 0.1);
+        }
+
+        .voucher-card.popular {
+            border-color: var(--primary-blue);
+            box-shadow: 0 10px 25px rgba(24, 101, 242, 0.12);
+        }
+
+        .popular-ribbon {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: var(--primary-blue);
+            color: white;
+            font-size: 0.72rem;
+            font-weight: 800;
+            padding: 6px 20px 6px 14px;
+            border-radius: 0 18px 0 18px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 15% 100%);
+        }
+
+        .badge-type {
+            display: inline-block;
+            background: var(--primary-blue);
+            color: white;
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 4px 14px;
+            border-radius: 8px;
+            margin-bottom: 14px;
+        }
+
+        .voucher-duration {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #475569;
+            margin-bottom: 4px;
+        }
+
+        .voucher-price {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--primary-blue);
+            margin-bottom: 4px;
+        }
+
+        .voucher-desc {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .badge-stock {
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 50px;
+            display: inline-block;
+            margin-bottom: 18px;
+        }
+
+        .badge-stock.available {
+            background-color: #ecfdf5;
+            color: #059669;
+        }
+
+        .badge-stock.out {
+            background-color: #fef2f2;
+            color: #dc2626;
+        }
+
+        .voucher-features {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 20px 0;
+            font-size: 0.88rem;
+            color: #475569;
+        }
+
+        .voucher-features li {
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .voucher-features i {
+            color: var(--primary-blue);
+        }
+
+        .btn-outline-detail {
+            border: 1.5px solid #cbd5e1;
+            color: #475569;
+            font-weight: 700;
+            border-radius: 12px;
+            padding: 10px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-outline-detail:hover {
+            border-color: var(--primary-blue);
+            color: var(--primary-blue);
+            background-color: #f0f5ff;
+        }
+
+        .btn-buy-now {
+            background-color: var(--primary-blue);
+            color: white !important;
+            font-weight: 700;
+            border-radius: 12px;
+            padding: 11px;
+            border: none;
+            transition: all 0.2s ease;
+        }
+
+        .btn-buy-now:hover:not(:disabled) {
+            background-color: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        /* Tentang Kami Section */
+        #about {
+            padding: 90px 0;
+            background-color: var(--light-bg);
+        }
+
+        .about-sub {
+            color: var(--primary-blue);
+            font-size: 0.8rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .about-title {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 20px;
+        }
+
+        .stat-box {
+            background: white;
+            border-radius: 16px;
+            padding: 16px 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            border: 1px solid #f1f5f9;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: #eff6ff;
+            color: var(--primary-blue);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2rem;
-            margin: 0 auto 25px;
-            transition: all 0.3s ease;
+            font-size: 1.25rem;
         }
 
-        .service-card:hover .service-icon {
-            background: var(--gradient);
-            color: white;
-            transform: scale(1.1) rotate(5deg);
-        }
-
-        .service-title {
-            font-weight: 700;
-            font-size: 1.4rem;
-            margin-bottom: 15px;
-        }
-
-        /* Pricing */
-        .pricing-card.popular {
-            border: 2px solid var(--primary);
-            box-shadow: var(--shadow-md);
-        }
-
-        .popular-badge {
-            position: absolute;
-            top: 20px;
-            right: -35px;
-            transform: rotate(45deg);
-            background: var(--gradient);
-            color: white;
-            padding: 8px 40px;
-            font-size: 0.8rem;
-            font-weight: 700;
-            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
-        }
-
-        .pricing-price {
-            font-size: 2.5rem;
+        .stat-val {
+            font-size: 1.35rem;
             font-weight: 800;
-            color: var(--primary);
-            margin: 20px 0 5px;
-            background: var(--gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: var(--text-main);
+            line-height: 1.1;
         }
 
-        .pricing-btn {
-            display: block;
-            width: 100%;
-            padding: 12px;
-            border-radius: 15px;
-            font-weight: 600;
+        .stat-label {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+        }
+
+        .about-card-net {
+            background: white;
+            border-radius: 24px;
+            padding: 35px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+            border: 1px solid #f1f5f9;
             text-align: center;
-            text-decoration: none;
+        }
+
+        /* Layanan Kami Section */
+        #services {
+            padding: 90px 0;
+            background-color: white;
+        }
+
+        .service-box {
+            background: white;
+            border-radius: 20px;
+            padding: 32px 24px;
+            border: 1px solid #f1f5f9;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.03);
             transition: all 0.3s ease;
-            border: 2px solid var(--primary);
-            background: var(--primary);
-            color: white;
-            margin-top: 10px;
+            text-align: center;
+            height: 100%;
         }
 
-        .pricing-btn:hover {
-            background: transparent;
-            color: var(--primary);
+        .service-box:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 30px rgba(24, 101, 242, 0.08);
+            border-color: rgba(24, 101, 242, 0.2);
         }
 
-        .pricing-btn.secondary {
-            background: transparent;
-            color: var(--primary);
-            border: 2px solid rgba(67, 97, 238, 0.3);
-        }
-
-        .pricing-btn.secondary:hover {
-            border-color: var(--primary);
-            background: rgba(67, 97, 238, 0.05);
-        }
-
-        /* About */
-        .about-img {
-            border-radius: 30px;
-            box-shadow: var(--shadow-lg);
-            transform: rotate(-2deg);
-            transition: all 0.5s ease;
-        }
-
-        .about-img:hover {
-            transform: rotate(0) scale(1.02);
+        .service-icon-circle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #eff6ff;
+            color: var(--primary-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin: 0 auto 20px;
         }
 
         /* Footer */
         footer {
-            background: var(--dark);
+            background-color: var(--dark-bg);
+            color: #94a3b8;
+            padding: 70px 0 0;
+            font-size: 0.9rem;
+        }
+
+        footer h5 {
             color: white;
-            padding: 80px 0 30px;
-            position: relative;
-        }
-
-        .footer-title {
             font-weight: 700;
-            margin-bottom: 25px;
-            font-size: 1.5rem;
+            font-size: 1.1rem;
+            margin-bottom: 22px;
         }
 
-        .social-links a {
-            width: 45px;
-            height: 45px;
+        footer a {
+            color: #94a3b8;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        footer a:hover {
+            color: white;
+        }
+
+        .social-btn {
+            width: 38px;
+            height: 38px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            text-decoration: none;
-            margin-right: 10px;
+            margin-right: 8px;
             transition: all 0.3s ease;
         }
 
-        .social-links a:hover {
-            background: var(--primary);
-            transform: translateY(-5px);
+        .social-btn:hover {
+            background: var(--primary-blue);
+            color: white;
+            transform: translateY(-2px);
         }
 
-        /* Mobile Responsive */
-        @media (max-width: 991px) {
-            .hero-content h1 {
-                font-size: 2.5rem;
-            }
-
-            .navbar-collapse {
-                background: white;
-                padding: 20px;
-                border-radius: 15px;
-                box-shadow: var(--shadow-lg);
-                margin-top: 15px;
-            }
-
-            .navbar-toggler {
-                border: 2px solid var(--primary);
-                padding: 8px 12px;
-            }
-
-            .navbar-toggler:focus {
-                box-shadow: 0 0 0 0.2rem rgba(67, 97, 238, 0.25);
-            }
-
-            .service-card,
-            .pricing-card {
-                padding: 30px 20px;
-                margin-bottom: 20px;
-            }
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 24px 0;
+            margin-top: 50px;
+            font-size: 0.82rem;
         }
 
-        @media (max-width: 768px) {
-            .hero-content h1 {
-                font-size: 2rem;
-                line-height: 1.3;
-            }
-
-            .hero-content p {
-                font-size: 1.1rem;
-                line-height: 1.6;
-            }
-
-            .section-title h2 {
-                font-size: 2rem;
-            }
-
-            section {
-                padding: 60px 0;
-            }
-
-            #voucher,
-            #services,
-            #about {
-                padding: 50px 0;
-            }
-
-            .navbar-brand {
-                font-size: 1.5rem;
-            }
-
-            .pricing-price {
-                font-size: 2rem;
-            }
-
-            .service-icon {
-                width: 70px;
-                height: 70px;
-                font-size: 1.8rem;
-            }
-
-            .footer-title {
-                font-size: 1.3rem;
-            }
-
-            .pricing-card {
-                margin-bottom: 25px;
-            }
-        }
-
-        @media (max-width: 576px) {
-            html, body {
-                max-width: 100%;
-                overflow-x: hidden;
-            }
-
-            /* Safety reset for standard box model behavior */
-            *, ::after, ::before {
-                box-sizing: border-box;
-            }
-
-            .navbar {
-                padding: 10px 0;
-            }
-
-            .navbar-brand {
-                font-size: 1.4rem;
-            }
-            
+        /* Responsive Breakpoints */
+        @media (max-width: 991.98px) {
             #home {
-                padding: 110px 0 50px; 
-                background-position: center top;
-                width: 100%;
-                position: relative;
-                overflow: hidden;
-            }
-
-            .hero-content {
-                padding: 0 20px;
                 text-align: center;
-                width: 100%;
+                padding-top: 130px;
             }
-
-            .hero-content h1 {
-                font-size: clamp(2rem, 9vw, 2.5rem); 
-                margin-bottom: 1rem;
-                text-align: center;
+            .hero-desc, .hero-features {
+                justify-content: center;
+                margin-left: auto;
+                margin-right: auto;
             }
-
-            .hero-content p {
-                font-size: 1rem;
-                margin-bottom: 2rem;
-                line-height: 1.5;
-                text-align: center;
-                opacity: 0.95;
-                padding: 0 10px; /* Prevent text hitting edges changes */
+            .about-card-net {
+                margin-top: 30px;
             }
-
-            .hero-btn {
-                padding: 15px 30px;
-                width: 100%;
-                display: inline-block;
-                text-align: center;
-                box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
-            }
-
-            section {
-                padding: 60px 0;
-            }
-
-            .section-title {
-                margin-bottom: 30px;
-            }
-
-            .section-title h2 {
-                font-size: 1.8rem;
-            }
-            
-            /* Card Refinements */
-            .pricing-card {
-                padding: 30px 20px;
-                margin-bottom: 25px;
-                border: 1px solid rgba(0,0,0,0.04);
-                box-shadow: 0 4px 15px rgba(0,0,0,0.03); /* Subtle shadow */
-            }
-            
-            /* Add spacing between stacked columns */
-            .col-md-6.col-lg-3 {
-                padding-bottom: 10px;
-            }
-
-            .pricing-price {
-                font-size: 2.2rem;
-            }
-        }
-
-        @media (max-width: 400px) {
-            .navbar-brand {
-                font-size: 1.2rem;
-            }
-
-            #home {
-                min-height: 80vh;
-                padding: 70px 0 30px;
-            }
-
-            .hero-content h1 {
-                font-size: 1.4rem;
-            }
-
-            .hero-content p {
-                font-size: 0.85rem;
-            }
-
-            .hero-btn {
-                padding: 10px 20px;
-                font-size: 0.85rem;
-                max-width: 250px;
-            }
-
-            .section-title h2 {
-                font-size: 1.4rem;
-            }
-
-            .service-card,
-            .pricing-card {
-                padding: 18px 12px;
-            }
-
-            .service-icon {
-                width: 50px;
-                height: 50px;
-                font-size: 1.2rem;
-            }
-
-            .service-title {
-                font-size: 1rem;
-            }
-
-            .pricing-price {
-                font-size: 1.4rem;
-            }
-
-            .pricing-btn {
-                padding: 8px 12px;
-                font-size: 0.85rem;
-            }
-        }
-
-        /* Navbar Toggler Custom Style */
-        .navbar-toggler {
-            border-color: var(--primary);
-        }
-
-        .navbar-toggler-icon {
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(67, 97, 238, 1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
         }
     </style>
 </head>
 
 <body>
+
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container">
-            <a class="navbar-brand" href="#home" data-aos="fade-right">Yusril<span>Net</span></a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
+            <a class="navbar-brand" href="#home">
+                <i class="fas fa-wifi text-primary me-1"></i>Yusril<span style="color: var(--primary-blue);">Net</span>
+            </a>
+            
+            <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="fas fa-bars text-primary fs-3"></span>
             </button>
+            
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto align-items-center">
-                    <li class="nav-item"><a class="nav-link" href="#home">Beranda</a></li>
+                <ul class="navbar-nav mx-auto align-items-center">
+                    <li class="nav-item"><a class="nav-link active" href="#home">Beranda</a></li>
                     <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
                     <li class="nav-item"><a class="nav-link" href="#services">Service</a></li>
                     <li class="nav-item"><a class="nav-link" href="#voucher">Voucher</a></li>
                 </ul>
+                <div class="d-flex align-items-center justify-content-center mt-3 mt-lg-0">
+                    <a href="#voucher" class="btn btn-nav-buy">Beli Voucher</a>
+                </div>
             </div>
         </div>
     </nav>
@@ -567,253 +554,238 @@
     <!-- Hero Section -->
     <section id="home">
         <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-lg-10">
-                    <div class="hero-content">
-                        <h1 data-aos="fade-up">Internet Cepat & Stabil Untuk Semua Kebutuhan Anda</h1>
-                        <p data-aos="fade-up" data-aos-delay="100">Nikmati pengalaman internet tanpa batas dengan
-                            voucher wifi Yusril Net. Kecepatan tinggi, koneksi stabil, dan harga terjangkau.</p>
-                        <a href="#voucher" class="hero-btn" data-aos="fade-up" data-aos-delay="200">
-                            <i class="fas fa-shopping-cart me-2"></i>Beli Voucher Sekarang
-                        </a>
+            <div class="row align-items-center">
+                <div class="col-lg-8" data-aos="fade-up">
+                    <div class="hero-badge">INTERNET CEPAT & STABIL</div>
+                    <h1 class="hero-title">Internet Cepat & Stabil<br>Untuk <span>Semua Kebutuhan</span> Anda</h1>
+                    <p class="hero-desc">Nikmati pengalaman internet tanpa batas dengan voucher wifi Yusril Net. Kecepatan tinggi, koneksi stabil, dan harga terjangkau.</p>
+
+                    <div class="hero-features">
+                        <div><i class="fas fa-rocket text-info"></i> Cepat & Stabil</div>
+                        <div><i class="fas fa-bolt text-warning"></i> Harga Terjangkau</div>
+                        <div><i class="fas fa-check-circle text-success"></i> Mudah Digunakan</div>
                     </div>
+
+                    <a href="#voucher" class="btn btn-hero-cta">
+                        <i class="fas fa-shopping-cart"></i> Beli Voucher Sekarang
+                    </a>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Voucher Section -->
+    <!-- Paket Voucher Section -->
     <section id="voucher">
         <div class="container">
-            <div class="section-title" data-aos="fade-up">
+            <div class="section-header" data-aos="fade-up">
                 <h2>Paket Voucher</h2>
+                <div class="section-header-line"></div>
             </div>
-            <div class="row">
-                @foreach ($pakets as $paket)
-                    {{-- Variabel didefinisikan di awal agar bisa digunakan di seluruh card DAN modal --}}
-                    @php
-                        $jumlahVoucher = $paket->vouchers_available_count ?? 0;
-                        $bisaBeli = $paket->available == 1 && $jumlahVoucher > 0;
-                    @endphp
 
-                    <div class="col-md-6 col-lg-3 mb-4" data-aos="fade-up"
-                        data-aos-delay="{{ $loop->iteration * 100 }}">
-                        <div class="pricing-card {{ $loop->iteration == 2 ? 'popular' : '' }}">
-                            @if ($loop->iteration == 2)
-                                <div class="popular-badge">Terlaris</div>
-                            @endif
+            <div class="row g-4 align-items-center">
+                <!-- Grid Voucher Cards (Left Side) -->
+                <div class="col-lg-7">
+                    <div class="row g-3">
+                        @foreach ($pakets as $paket)
+                            @php
+                                $jumlahVoucher = $paket->vouchers_available_count ?? 0;
+                                $bisaBeli = $paket->available == 1 && $jumlahVoucher > 0;
+                                $isPopular = $loop->iteration == 2;
+                            @endphp
 
-                            <div class="text-center mb-4">
-                                <h3 class="service-title">{{ $paket->nama }}</h3>
-                                <div class="pricing-price">Rp {{ number_format($paket->price, 0, ',', '.') }}</div>
-                                <div class="text-muted">{{ $paket->deskripsi }}</div>
+                            <div class="col-sm-6" data-aos="fade-up" data-aos-delay="{{ $loop->iteration * 100 }}">
+                                <div class="voucher-card {{ $isPopular ? 'popular' : '' }}">
+                                    @if($isPopular)
+                                        <div class="popular-ribbon">Popular</div>
+                                    @endif
 
-                                @if ($paket->available == 0)
-                                    <span class="badge rounded-pill mt-3 bg-danger-subtle text-danger">
-                                        Tidak Tersedia
-                                    </span>
-                                @elseif ($jumlahVoucher > 0)
-                                    <span class="badge rounded-pill mt-3 bg-success-subtle text-success">
-                                        {{ $jumlahVoucher }} Voucher Tersedia
-                                    </span>
-                                @else
-                                    <span class="badge rounded-pill mt-3 bg-warning-subtle text-warning">
-                                        Stok Habis
-                                    </span>
-                                @endif
-                            </div>
+                                    <div>
+                                        <span class="badge-type">{{ $loop->iteration == 1 ? 'Basic' : 'Premium' }}</span>
+                                        <div class="voucher-duration">{{ $paket->nama }}</div>
+                                        <div class="voucher-price">Rp {{ number_format($paket->price, 0, ',', '.') }}</div>
+                                        <div class="voucher-desc">{{ $paket->deskripsi }}</div>
 
-                            <ul class="list-unstyled mb-4">
-                                @php $details = $paket->detail_paket ? json_decode($paket->detail_paket) : []; @endphp
-                                @if (is_array($details) && count($details) > 0)
-                                    @foreach (array_slice($details, 0, 3) as $detail)
-                                        <li class="mb-2 d-flex align-items-center"><i
-                                                class="fas fa-check-circle text-primary me-2"></i> {{ $detail }}
-                                        </li>
-                                    @endforeach
-                                @else
-                                    <li class="text-muted">Detail tidak tersedia</li>
-                                @endif
-                            </ul>
+                                        @if ($paket->available == 0)
+                                            <span class="badge-stock out">Tidak Tersedia</span>
+                                        @elseif ($jumlahVoucher > 0)
+                                            <span class="badge-stock available"><i class="fas fa-check me-1"></i>Voucher Ready</span>
+                                        @else
+                                            <span class="badge-stock out">Stok Habis</span>
+                                        @endif
 
-                            <div class="d-grid gap-2">
-                                <button type="button" class="pricing-btn secondary" data-bs-toggle="modal"
-                                    data-bs-target="#deskripsiModal{{ $paket->id }}">
-                                    Detail
-                                </button>
-
-                                @if ($bisaBeli)
-                                    <a href="{{ route('public.beli', $paket->id) }}" class="pricing-btn">
-                                        Beli Sekarang
-                                    </a>
-                                @else
-                                    <button class="pricing-btn" disabled style="opacity: 0.5; cursor: not-allowed;">
-                                        {{ $paket->available == 0 ? 'Tidak Tersedia' : 'Habis' }}
-                                    </button>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Modal (Keep existing structure but clean up classes) -->
-                    <div class="modal fade" id="deskripsiModal{{ $paket->id }}" tabindex="-1" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered modal-lg">
-                            <div class="modal-content border-0 shadow-lg"
-                                style="border-radius: 20px; overflow: hidden;">
-                                <div class="modal-header border-0 p-4"
-                                    style="background: var(--gradient); color: white;">
-                                    <h5 class="modal-title fw-bold"><i
-                                            class="fas fa-wifi me-2"></i>{{ $paket->nama }}</h5>
-                                    <button type="button" class="btn-close btn-close-white"
-                                        data-bs-dismiss="modal"></button>
-                                </div>
-                                <div class="modal-body p-4">
-                                    {{-- ... (isi modal body tidak berubah) ... --}}
-                                    <div class="row g-4">
-                                        <div class="col-md-6">
-                                            <div class="p-3 bg-light rounded-4 h-100">
-                                                <h6 class="fw-bold text-primary mb-3">Deskripsi</h6>
-                                                <p class="text-muted mb-0">{{ $paket->deskripsi }}</p>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="row g-3">
-                                                <div class="col-6">
-                                                    <div class="p-3 bg-light rounded-4 text-center">
-                                                        <small class="text-muted d-block mb-1">Harga</small>
-                                                        <h5 class="fw-bold text-primary mb-0">Rp
-                                                            {{ number_format($paket->price, 0, ',', '.') }}</h5>
-                                                    </div>
-                                                </div>
-                                                <div class="col-6">
-                                                    <div class="p-3 bg-light rounded-4 text-center">
-                                                        <small class="text-muted d-block mb-1">Durasi</small>
-                                                        <h5 class="fw-bold text-primary mb-0">{{ $paket->duration }}
-                                                            Hari
-                                                        </h5>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="mt-4">
-                                        <h6 class="fw-bold text-primary mb-3">Fitur Lengkap</h6>
-                                        <div class="row">
+                                        <ul class="voucher-features">
+                                            @php $details = $paket->detail_paket ? json_decode($paket->detail_paket) : []; @endphp
                                             @if (is_array($details) && count($details) > 0)
-                                                @foreach ($details as $detail)
-                                                    <div class="col-md-6 mb-2">
-                                                        <div class="d-flex align-items-center">
-                                                            <i class="fas fa-check-circle text-success me-2"></i>
-                                                            <span>{{ $detail }}</span>
+                                                @foreach (array_slice($details, 0, 2) as $detail)
+                                                    <li><i class="fas fa-check-circle"></i> <span>{{ $detail }}</span></li>
+                                                @endforeach
+                                            @else
+                                                <li><i class="fas fa-check-circle"></i> <span>Unlimited High Speed</span></li>
+                                            @endif
+                                        </ul>
+                                    </div>
+
+                                    <div class="d-grid gap-2 mt-3">
+                                        <button type="button" class="btn btn-outline-detail" data-bs-toggle="modal" data-bs-target="#deskripsiModal{{ $paket->id }}">
+                                            Detail
+                                        </button>
+
+                                        @if ($bisaBeli)
+                                            <a href="{{ route('public.beli', $paket->id) }}" class="btn btn-buy-now text-center text-decoration-none">
+                                                Beli Sekarang
+                                            </a>
+                                        @else
+                                            <button class="btn btn-buy-now" disabled style="opacity: 0.5; cursor: not-allowed;">
+                                                {{ $paket->available == 0 ? 'Tidak Tersedia' : 'Habis' }}
+                                            </button>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Detail Modal -->
+                            <div class="modal fade" id="deskripsiModal{{ $paket->id }}" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered modal-lg">
+                                    <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+                                        <div class="modal-header border-0 p-4" style="background: linear-gradient(135deg, var(--primary-blue), var(--cyan-accent)); color: white;">
+                                            <h5 class="modal-title fw-bold"><i class="fas fa-wifi me-2"></i>{{ $paket->nama }}</h5>
+                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <div class="modal-body p-4">
+                                            <div class="row g-4">
+                                                <div class="col-md-6">
+                                                    <div class="p-3 bg-light rounded-4 h-100">
+                                                        <h6 class="fw-bold text-primary mb-3">Deskripsi Paket</h6>
+                                                        <p class="text-muted mb-0">{{ $paket->deskripsi }}</p>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="row g-3">
+                                                        <div class="col-6">
+                                                            <div class="p-3 bg-light rounded-4 text-center">
+                                                                <small class="text-muted d-block mb-1">Harga</small>
+                                                                <h5 class="fw-bold text-primary mb-0">Rp {{ number_format($paket->price, 0, ',', '.') }}</h5>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-6">
+                                                            <div class="p-3 bg-light rounded-4 text-center">
+                                                                <small class="text-muted d-block mb-1">Masa Aktif</small>
+                                                                <h5 class="fw-bold text-primary mb-0">{{ $paket->duration }} Hari</h5>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                @endforeach
+                                                </div>
+                                            </div>
+                                            <div class="mt-4">
+                                                <h6 class="fw-bold text-primary mb-3">Fitur Lengkap</h6>
+                                                <div class="row">
+                                                    @if (is_array($details) && count($details) > 0)
+                                                        @foreach ($details as $detail)
+                                                            <div class="col-md-6 mb-2">
+                                                                <div class="d-flex align-items-center">
+                                                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                                                    <span>{{ $detail }}</span>
+                                                                </div>
+                                                            </div>
+                                                        @endforeach
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer border-0 p-4 bg-light">
+                                            <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Tutup</button>
+                                            @if ($bisaBeli)
+                                                <a href="{{ route('public.beli', $paket->id) }}" class="btn btn-primary rounded-pill px-4">Beli Sekarang</a>
+                                            @else
+                                                <button class="btn btn-primary rounded-pill px-4" disabled style="opacity: 0.5; cursor: not-allowed;">
+                                                    {{ $paket->available == 0 ? 'Tidak Tersedia' : 'Habis' }}
+                                                </button>
                                             @endif
                                         </div>
                                     </div>
                                 </div>
-                                <div class="modal-footer border-0 p-4 bg-light">
-                                    <button type="button" class="btn btn-light rounded-pill px-4"
-                                        data-bs-dismiss="modal">Tutup</button>
-
-                                    {{-- --- INILAH PERBAIKANNYA --- --}}
-                                    {{-- Menggunakan variabel $bisaBeli yang sudah ada --}}
-                                    @if ($bisaBeli)
-                                        <a href="{{ route('public.beli', $paket->id) }}"
-                                            class="btn btn-primary rounded-pill px-4">Beli Sekarang</a>
-                                    @else
-                                        <button class="btn btn-primary rounded-pill px-4" disabled
-                                            style="opacity: 0.5; cursor: not-allowed;">
-                                            {{ $paket->available == 0 ? 'Tidak Tersedia' : 'Habis' }}
-                                        </button>
-                                    @endif
-                                </div>
                             </div>
-                        </div>
+                        @endforeach
                     </div>
-                @endforeach
+                </div>
+
+                <!-- 3D Illustration Graphic (Right Side) -->
+                <div class="col-lg-5 text-center" data-aos="fade-left">
+                    <img src="{{ asset('images/avatar_wifi_3d.png') }}" alt="YusrilNet WiFi Illustration" class="img-fluid" style="max-height: 440px; filter: drop-shadow(0 15px 30px rgba(0,0,0,0.06));">
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- About Section -->
-    <section id="about" class="bg-white">
+    <!-- Tentang Kami Section -->
+    <section id="about">
         <div class="container">
             <div class="row align-items-center">
-                <div class="col-lg-6 mb-5 mb-lg-0" data-aos="fade-right">
-                    <div class="section-title text-start mb-4">
-                        <h2 style="margin-left: 0;">Tentang Kami</h2>
-                    </div>
-                    <p class="lead mb-4">YusrilNet Sriwijaya adalah penyedia layanan internet lokal yang berkomitmen
-                        memberikan akses internet cepat, stabil, dan terjangkau.</p>
-                    <p class="text-muted mb-4">Berdiri sejak 2021, kami telah melayani ratusan pelanggan di Bandung
-                        dengan dukungan teknisi profesional dan infrastruktur handal.</p>
+                <div class="col-lg-6" data-aos="fade-right">
+                    <div class="about-sub">TENTANG KAMI</div>
+                    <h2 class="about-title">YusrilNet Sriwijaya</h2>
+                    <p class="text-secondary mb-3">YusrilNet Sriwijaya adalah penyedia layanan internet lokal yang berkomitmen memberikan akses internet cepat, stabil, dan terjangkau.</p>
+                    <p class="text-secondary mb-4">Berdiri sejak 2021, kami telah melayani ribuan pelanggan di Bandung dengan dukungan teknisi profesional dan infrastruktur handal.</p>
 
-                    <div class="row g-4 mt-2">
-                        <div class="col-6">
-                            <div class="d-flex align-items-center">
-                                <div class="flex-shrink-0 btn-lg-square bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center"
-                                    style="width: 50px; height: 50px;">
-                                    <i class="fas fa-wifi fs-4"></i>
-                                </div>
-                                <div class="ms-3">
-                                    <h5 class="mb-0 fw-bold">10+</h5>
-                                    <small class="text-muted">Titik Hotspot</small>
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <div class="stat-box">
+                                <div class="stat-icon"><i class="fas fa-wifi"></i></div>
+                                <div>
+                                    <div class="stat-val">10+</div>
+                                    <div class="stat-label">Titik Hotspot</div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-6">
-                            <div class="d-flex align-items-center">
-                                <div class="flex-shrink-0 btn-lg-square bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center"
-                                    style="width: 50px; height: 50px;">
-                                    <i class="fas fa-users fs-4"></i>
-                                </div>
-                                <div class="ms-3">
-                                    <h5 class="mb-0 fw-bold">100+</h5>
-                                    <small class="text-muted">Pengguna Aktif</small>
+                        <div class="col-sm-6">
+                            <div class="stat-box">
+                                <div class="stat-icon"><i class="fas fa-users"></i></div>
+                                <div>
+                                    <div class="stat-val">100+</div>
+                                    <div class="stat-label">Pengguna Aktif</div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+
                 <div class="col-lg-6 text-center" data-aos="fade-left">
-                    <img src="{{ asset('logo.png') }}" alt="About YusrilNet" class="img-fluid about-img"
-                        style="max-height: 400px;">
+                    <div class="about-card-net mx-auto" style="max-width: 420px;">
+                        <img src="{{ asset('NET.png') }}" alt="YusrilNet Logo Emblem" class="img-fluid" style="max-height: 280px;">
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Services Section -->
+    <!-- Layanan Kami Section -->
     <section id="services">
         <div class="container">
-            <div class="section-title" data-aos="fade-up">
+            <div class="section-header" data-aos="fade-up">
                 <h2>Layanan Kami</h2>
+                <div class="section-header-line"></div>
             </div>
+
             <div class="row g-4">
-                <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="100">
-                    <div class="service-card">
-                        <div class="service-icon"><i class="fas fa-bolt"></i></div>
-                        <h3 class="service-title text-center">Kecepatan Tinggi</h3>
-                        <p class="text-center text-muted">Akses internet hingga 5 Mbps tanpa buffering untuk streaming
-                            dan browsing lancar.</p>
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+                    <div class="service-box">
+                        <div class="service-icon-circle"><i class="fas fa-bolt"></i></div>
+                        <h4 class="fw-bold fs-5 mb-2">Kecepatan Tinggi</h4>
+                        <p class="text-muted small mb-0">Akses internet hingga 5 Mbps tanpa buffering untuk streaming dan browsing lancar.</p>
                     </div>
                 </div>
-                <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="200">
-                    <div class="service-card">
-                        <div class="service-icon"><i class="fas fa-shield-alt"></i></div>
-                        <h3 class="service-title text-center">Aman & Privat</h3>
-                        <p class="text-center text-muted">Sistem keamanan terkini untuk melindungi data dan privasi
-                            Anda
-                            saat berselancar.</p>
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+                    <div class="service-box">
+                        <div class="service-icon-circle"><i class="fas fa-shield-alt"></i></div>
+                        <h4 class="fw-bold fs-5 mb-2">Aman & Privat</h4>
+                        <p class="text-muted small mb-0">Sistem keamanan terkini untuk melindungi data dan privasi Anda saat berselancar.</p>
                     </div>
                 </div>
-                <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="300">
-                    <div class="service-card">
-                        <div class="service-icon"><i class="fas fa-headset"></i></div>
-                        <h3 class="service-title text-center">Support 24/7</h3>
-                        <p class="text-center text-muted">Tim teknis kami siap membantu Anda kapanpun jika terjadi
-                            kendala koneksi.</p>
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
+                    <div class="service-box">
+                        <div class="service-icon-circle"><i class="fas fa-headset"></i></div>
+                        <h4 class="fw-bold fs-5 mb-2">Support 24/7</h4>
+                        <p class="text-muted small mb-0">Tim teknis kami siap membantu Anda kapanpun jika terjadi kendala koneksi.</p>
                     </div>
                 </div>
             </div>
@@ -823,61 +795,55 @@
     <!-- Footer -->
     <footer>
         <div class="container">
-            <div class="row g-5">
-                <div class="col-lg-4">
-                    <h3 class="footer-title">Yusril Net</h3>
-                    <p class="text-white-50">Solusi internet hemat dan cepat untuk masyarakat. Terhubung lebih mudah
-                        dengan dunia digital.</p>
-                    <div class="social-links mt-4">
-                        <a href="#"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                        <a href="#"><i class="fab fa-whatsapp"></i></a>
+            <div class="row g-4">
+                <div class="col-lg-4 col-md-6">
+                    <h5 class="fw-bold text-white mb-3">YusrilNet</h5>
+                    <p class="small text-secondary mb-4">Solusi internet hemat dan cepat untuk masyarakat. Terhubung lebih mudah dengan dunia digital.</p>
+                    <div>
+                        <a href="#" class="social-btn"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="social-btn"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-btn"><i class="fab fa-whatsapp"></i></a>
                     </div>
                 </div>
+
                 <div class="col-lg-2 col-6">
-                    <h3 class="footer-title">Navigasi</h3>
-                    <ul class="list-unstyled text-white-50">
-                        <li class="mb-2"><a href="#home" class="text-white text-decoration-none">Home</a></li>
-                        <li class="mb-2"><a href="#voucher" class="text-white text-decoration-none">Voucher</a>
-                        </li>
-                        <li class="mb-2"><a href="#about" class="text-white text-decoration-none">About</a></li>
-                        <li class="mb-2"><a href="#services" class="text-white text-decoration-none">Services</a>
-                        </li>
+                    <h5>Navigasi</h5>
+                    <ul class="list-unstyled small mb-0">
+                        <li class="mb-2"><a href="#home">Home</a></li>
+                        <li class="mb-2"><a href="#voucher">Voucher</a></li>
+                        <li class="mb-2"><a href="#about">About</a></li>
+                        <li class="mb-2"><a href="#services">Services</a></li>
                     </ul>
                 </div>
+
                 <div class="col-lg-3 col-6">
-                    <h3 class="footer-title">Layanan</h3>
-                    <ul class="list-unstyled text-white-50">
+                    <h5>Layanan</h5>
+                    <ul class="list-unstyled small mb-0">
                         <li class="mb-2">WiFi Harian</li>
                         <li class="mb-2">WiFi Mingguan</li>
                         <li class="mb-2">WiFi Bulanan</li>
                         <li class="mb-2">Pemasangan Baru</li>
                     </ul>
                 </div>
-                <div class="col-lg-3">
-                    <h3 class="footer-title">Kontak</h3>
-                    <ul class="list-unstyled text-white-50">
-                        <li class="mb-3 d-flex"><i class="fas fa-map-marker-alt mt-1 me-3"></i> Jl. Sriwijaya Gg. IX
-                            No.31, Bandung</li>
-                        <li class="mb-3 d-flex"><i class="fas fa-phone mt-1 me-3"></i> +62 812-3456-7890</li>
-                        <li class="mb-3 d-flex"><i class="fas fa-envelope mt-1 me-3"></i> info@yusrilnet.com</li>
+
+                <div class="col-lg-3 col-md-6">
+                    <h5>Kontak</h5>
+                    <ul class="list-unstyled small mb-0">
+                        <li class="mb-2 d-flex"><i class="fas fa-map-marker-alt text-primary mt-1 me-2"></i> <span>Jl. Sriwijaya Gg. IX No.31, Bandung</span></li>
+                        <li class="mb-2 d-flex"><i class="fas fa-phone text-primary mt-1 me-2"></i> <span>+62 812-3456-7890</span></li>
+                        <li class="mb-2 d-flex"><i class="fas fa-envelope text-primary mt-1 me-2"></i> <span>info@yusrilnet.com</span></li>
                     </ul>
                 </div>
             </div>
-            <div class="border-top border-secondary mt-5 pt-4">
-                <div class="d-flex flex-column flex-md-row justify-content-between align-items-center text-white-50">
-                    <p class="mb-2 mb-md-0">&copy; 2025 Yusril Net. All rights reserved.</p>
-                    <ul class="list-inline mb-0">
-                        <li class="list-inline-item ms-3"><a href="#"
-                                class="text-white-50 text-decoration-none" data-bs-toggle="modal"
-                                data-bs-target="#termsModal">Syarat & Ketentuan</a></li>
-                        <li class="list-inline-item ms-3"><a href="#"
-                                class="text-white-50 text-decoration-none" data-bs-toggle="modal"
-                                data-bs-target="#refundModal">Kebijakan Refund</a></li>
-                        <li class="list-inline-item ms-3"><a href="#"
-                                class="text-white-50 text-decoration-none" data-bs-toggle="modal"
-                                data-bs-target="#faqModal">FAQ</a></li>
-                    </ul>
+
+            <div class="footer-bottom">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
+                    <div>&copy; 2025 Yusril Net. All rights reserved.</div>
+                    <div class="d-flex gap-3">
+                        <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">Syarat & Ketentuan</a>
+                        <a href="#" data-bs-toggle="modal" data-bs-target="#refundModal">Kebijakan Refund</a>
+                        <a href="#" data-bs-toggle="modal" data-bs-target="#faqModal">FAQ</a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -888,35 +854,24 @@
     <div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content border-0 shadow-lg">
-                <div class="modal-header border-0" style="background: var(--gradient); color: white;">
+                <div class="modal-header border-0" style="background: linear-gradient(135deg, var(--primary-blue), var(--cyan-accent)); color: white;">
                     <h5 class="modal-title fw-bold" id="termsModalLabel">
-                        <img src="{{ asset('Logo.png') }}" alt="Logo" height="30" class="me-2">
+                        <img src="{{ asset('Logo.png') }}" alt="Logo" height="28" class="me-2">
                         SYARAT & KETENTUAN
                     </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                        aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
-                    <p>Dengan melakukan pembelian dan/atau mengakses website voucheryusril.biz.id, Anda menyetujui
-                        poin-poin berikut:</p>
+                <div class="modal-body p-4">
+                    <p>Dengan melakukan pembelian dan/atau mengakses website YusrilNet, Anda menyetujui poin-poin berikut:</p>
                     <ol>
-                        <li class="mb-2"><strong>Status Produk:</strong> Produk yang kami jual adalah voucher
-                            internet Wi-Fi Yusril.net yang bersifat digital dan selalu ready stock, dengan detail paket
-                            tersedia di katalog website.</li>
-                        <li class="mb-2"><strong>Kesesuaian Layanan:</strong> Voucher ini hanya dapat digunakan di
-                            area yang terjangkau oleh jaringan Wi-Fi Yusril.net. Pengguna wajib memastikan lokasi berada
-                            dalam jangkauan.</li>
-                        <li class="mb-2"><strong>Tanggung Jawab Pengguna:</strong> Pembeli bertanggung jawab penuh
-                            atas kerahasiaan kode voucher yang diterima. Penggunaan kode yang berlebihan atau
-                            penyalahgunaan (seperti sharing tanpa izin) dapat mengakibatkan pemblokiran kode tanpa
-                            pengembalian dana.</li>
-                        <li class="mb-2"><strong>Hak Perubahan:</strong> Kami berhak mengubah Syarat & Ketentuan ini
-                            kapan saja tanpa pemberitahuan sebelumnya. Penggunaan layanan yang berlanjut dianggap
-                            sebagai persetujuan atas perubahan tersebut.</li>
+                        <li class="mb-2"><strong>Status Produk:</strong> Produk yang kami jual adalah voucher internet Wi-Fi Yusril.net yang bersifat digital dan selalu ready stock, dengan detail paket tersedia di katalog website.</li>
+                        <li class="mb-2"><strong>Kesesuaian Layanan:</strong> Voucher ini hanya dapat digunakan di area yang terjangkau oleh jaringan Wi-Fi Yusril.net. Pengguna wajib memastikan lokasi berada dalam jangkauan.</li>
+                        <li class="mb-2"><strong>Tanggung Jawab Pengguna:</strong> Pembeli bertanggung jawab penuh atas kerahasiaan kode voucher yang diterima. Penggunaan kode yang berlebihan atau penyalahgunaan dapat mengakibatkan pemblokiran kode tanpa pengembalian dana.</li>
+                        <li class="mb-2"><strong>Hak Perubahan:</strong> Kami berhak mengubah Syarat & Ketentuan ini kapan saja tanpa pemberitahuan sebelumnya. Penggunaan layanan yang berlanjut dianggap sebagai persetujuan atas perubahan tersebut.</li>
                     </ol>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                <div class="modal-footer border-0 bg-light">
+                    <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Tutup</button>
                 </div>
             </div>
         </div>
@@ -926,37 +881,23 @@
     <div class="modal fade" id="refundModal" tabindex="-1" aria-labelledby="refundModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content border-0 shadow-lg">
-                <div class="modal-header border-0" style="background: var(--gradient); color: white;">
+                <div class="modal-header border-0" style="background: linear-gradient(135deg, var(--primary-blue), var(--cyan-accent)); color: white;">
                     <h5 class="modal-title fw-bold" id="refundModalLabel">
-                        <img src="{{ asset('Logo.png') }}" alt="Logo" height="30" class="me-2">
+                        <img src="{{ asset('Logo.png') }}" alt="Logo" height="28" class="me-2">
                         KEBIJAKAN REFUND
                     </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                        aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body p-4">
                     <p>Mengingat voucher adalah produk digital, berikut adalah ketentuan pengembalian dana (refund):</p>
                     <ol>
-                        <li class="mb-2"><strong>Sifat Transaksi:</strong> Semua pembelian voucher adalah final
-                            setelah kode berhasil terkirim. Pembatalan atau pengembalian dana tidak berlaku jika kode
-                            sudah terkirim dan valid/dapat digunakan.</li>
-                        <li class="mb-2"><strong>Kondisi Refund:</strong> Refund hanya dapat diproses jika terjadi
-                            kegagalan sistem yang menyebabkan salah satu dari kondisi ini:
-                            <ul>
-                                <li>Voucher tidak terkirim setelah pembayaran terkonfirmasi.</li>
-                                <li>Voucher terkirim, namun kode terbukti invalid (tidak dapat digunakan) setelah
-                                    diverifikasi oleh tim kami.</li>
-                            </ul>
-                        </li>
-                        <li class="mb-2"><strong>Prosedur Pengajuan:</strong> Permintaan refund harus diajukan
-                            maksimal 24 jam setelah pembelian kepada Layanan Pelanggan dengan melampirkan bukti
-                            pembayaran.</li>
-                        <li class="mb-2"><strong>Proses Pengembalian:</strong> Jika refund disetujui, dana akan
-                            dikembalikan dalam waktu 3-5 hari kerja ke rekening/sumber pembayaran yang digunakan.</li>
+                        <li class="mb-2"><strong>Sifat Transaksi:</strong> Semua pembelian voucher adalah final setelah kode berhasil terkirim. Pembatalan atau pengembalian dana tidak berlaku jika kode sudah terkirim dan valid.</li>
+                        <li class="mb-2"><strong>Kondisi Refund:</strong> Refund hanya dapat diproses jika terjadi kegagalan sistem yang menyebabkan voucher tidak terkirim atau kode invalid.</li>
+                        <li class="mb-2"><strong>Prosedur Pengajuan:</strong> Permintaan refund harus diajukan maksimal 24 jam setelah pembelian kepada Layanan Pelanggan dengan melampirkan bukti pembayaran.</li>
                     </ol>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                <div class="modal-footer border-0 bg-light">
+                    <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Tutup</button>
                 </div>
             </div>
         </div>
@@ -966,31 +907,24 @@
     <div class="modal fade" id="faqModal" tabindex="-1" aria-labelledby="faqModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content border-0 shadow-lg">
-                <div class="modal-header border-0" style="background: var(--gradient); color: white;">
+                <div class="modal-header border-0" style="background: linear-gradient(135deg, var(--primary-blue), var(--cyan-accent)); color: white;">
                     <h5 class="modal-title fw-bold" id="faqModalLabel">
-                        <img src="{{ asset('Logo.png') }}" alt="Logo" height="30" class="me-2">
+                        <img src="{{ asset('Logo.png') }}" alt="Logo" height="28" class="me-2">
                         PERTANYAAN UMUM (FAQ)
                     </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                        aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body p-4">
                     <p>Berikut adalah ringkasan pertanyaan yang sering diajukan mengenai layanan kami:</p>
                     <ol>
-                        <li class="mb-2"><strong>Apa yang dijual?</strong> Kami menjual paket internet berupa kode
-                            voucher untuk mengakses layanan Wi-Fi Yusril.net.</li>
-                        <li class="mb-2"><strong>Apakah produk selalu tersedia?</strong> Ya, produk voucher adalah
-                            digital dan selalu ready stock. Ketersediaan paket dapat dilihat langsung di katalog
-                            voucheryusril.biz.id.</li>
-                        <li class="mb-2"><strong>Metode Pembayaran:</strong> Pembayaran dapat dilakukan melalui
-                            berbagai saluran yang difasilitasi oleh payment gateway iPaymu, seperti Virtual Account bank
-                            dan e-wallet.</li>
-                        <li class="mb-2"><strong>Kapan voucher dikirim?</strong> Kode voucher akan dikirimkan secara
-                            otomatis ke kontak terdaftar segera setelah pembayaran Anda dikonfirmasi oleh iPaymu.</li>
+                        <li class="mb-2"><strong>Apa yang dijual?</strong> Kami menjual paket internet berupa kode voucher untuk mengakses layanan Wi-Fi Yusril.net.</li>
+                        <li class="mb-2"><strong>Apakah produk selalu tersedia?</strong> Ya, produk voucher adalah digital dan selalu ready stock.</li>
+                        <li class="mb-2"><strong>Metode Pembayaran:</strong> Pembayaran dapat dilakukan melalui berbagai saluran yang difasilitasi oleh payment gateway iPaymu.</li>
+                        <li class="mb-2"><strong>Kapan voucher dikirim?</strong> Kode voucher akan dikirimkan secara otomatis ke email terdaftar segera setelah pembayaran Anda dikonfirmasi.</li>
                     </ol>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                <div class="modal-footer border-0 bg-light">
+                    <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Tutup</button>
                 </div>
             </div>
         </div>
@@ -1007,24 +941,34 @@
             offset: 100
         });
 
-        // Navbar Scroll Effect
-        window.addEventListener('scroll', function() {
-            if (window.scrollY > 50) {
-                document.querySelector('.navbar').classList.add('shadow-sm');
-                document.querySelector('.navbar').style.background = 'rgba(255, 255, 255, 0.95)';
-            } else {
-                document.querySelector('.navbar').classList.remove('shadow-sm');
-                document.querySelector('.navbar').style.background = 'rgba(255, 255, 255, 0.9)';
-            }
+        // Navbar active link highlight on scroll
+        const sections = document.querySelectorAll('section[id]');
+        window.addEventListener('scroll', () => {
+            const scrollY = window.pageYOffset;
+            sections.forEach(current => {
+                const sectionHeight = current.offsetHeight;
+                const sectionTop = current.offsetTop - 100;
+                const sectionId = current.getAttribute('id');
+                const link = document.querySelector('.navbar-nav a[href*=' + sectionId + ']');
+                if (link) {
+                    if (scrollY > sectionTop && scrollY <= sectionTop + sectionHeight) {
+                        document.querySelectorAll('.navbar-nav a').forEach(a => a.classList.remove('active'));
+                        link.classList.add('active');
+                    }
+                }
+            });
         });
 
         // Smooth Scroll
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function(e) {
                 e.preventDefault();
-                document.querySelector(this.getAttribute('href')).scrollIntoView({
-                    behavior: 'smooth'
-                });
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
             });
         });
     </script>
