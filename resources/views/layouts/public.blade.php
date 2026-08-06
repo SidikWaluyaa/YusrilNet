@@ -256,85 +256,100 @@
             color: white;
         }
 
-        /* Mobile Responsive */
+        /* Mobile First Responsive Overrides */
         @media (max-width: 768px) {
+            html {
+                font-size: 87.5%; /* Base scaling ~14px */
+            }
+
             .navbar-brand {
-                font-size: 1.5rem;
+                font-size: 1.4rem;
             }
 
             .main-content {
-                padding: 100px 0 60px;
-                margin-top: 10px;
+                padding: 95px 0 50px;
+                margin-top: 5px;
             }
 
             .custom-card-header {
-                font-size: 1.3rem;
-                padding: 20px;
+                font-size: 1.25rem;
+                padding: 18px 20px;
             }
 
             .btn-brand {
-                padding: 12px 25px;
+                padding: 14px 24px;
                 font-size: 1rem;
+                min-height: 48px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
             }
 
             .voucher-box {
-                padding: 20px;
+                padding: 18px;
+                margin: 20px 0;
             }
 
             .success-icon {
-                width: 80px;
-                height: 80px;
+                width: 75px;
+                height: 75px;
             }
 
             .success-icon i {
-                font-size: 2.5rem;
+                font-size: 2.2rem;
             }
         }
 
         @media (max-width: 576px) {
+            .container {
+                padding-left: 12px;
+                padding-right: 12px;
+            }
+
             .navbar-brand {
-                font-size: 1.3rem;
+                font-size: 1.25rem;
             }
 
             .main-content {
-                padding: 90px 15px 50px; /* Reduced side padding slightly, kept vertical */
-                margin-top: 5px;
+                padding: 85px 0 40px;
+                margin-top: 0;
             }
 
             .custom-card {
-                border-radius: 20px;
+                border-radius: 18px;
             }
 
             .custom-card-header {
                 font-size: 1.1rem;
-                padding: 15px;
+                padding: 14px;
             }
 
             .card-body {
-                padding: 20px !important;
+                padding: 18px !important;
             }
 
             .btn-brand {
-                padding: 12px 20px;
+                padding: 12px 18px;
                 font-size: 0.95rem;
+                min-height: 48px;
             }
 
             .list-group-item {
-                font-size: 0.95rem;
-                padding: 12px 0;
+                font-size: 0.92rem;
+                padding: 10px 0;
             }
 
             .voucher-box {
-                padding: 15px;
+                padding: 14px;
             }
 
             .voucher-code {
-                padding: 12px 15px;
+                padding: 10px 12px;
             }
 
             .copy-btn {
-                width: 35px;
-                height: 35px;
+                width: 42px;
+                height: 42px;
             }
         }
 

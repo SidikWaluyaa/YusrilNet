@@ -92,23 +92,21 @@
 
                             <!-- BAGIAN PERSETUJUAN (Client Side Only) -->
                             <div class="mb-4 p-3 bg-light rounded border">
-                                <div class="form-check">
+                                <div class="form-check d-flex align-items-center gap-2">
                                     <!-- Atribut 'required' memaksa browser mengecek ini tanpa perlu controller -->
-                                    <input class="form-check-input" type="checkbox" id="terms_check" required>
-                                    <label class="form-check-label fw-bold text-dark" for="terms_check">
+                                    <input class="form-check-input flex-shrink-0" type="checkbox" id="terms_check" style="width: 22px; height: 22px; cursor: pointer;" required>
+                                    <label class="form-check-label fw-bold text-dark mb-0 style-pointer" for="terms_check" style="cursor: pointer; font-size: 0.95rem;">
                                         Saya telah membaca dan menyetujui:
                                     </label>
                                 </div>
                                 <ul class="list-unstyled ms-4 mt-2 mb-0 small">
                                     <li class="mb-1">
-                                        1. <a href="#" class="text-decoration-none" data-bs-toggle="modal"
-                                            data-bs-target="#termsModal">Syarat &
-                                            Ketentuan</a>
+                                        1. <a href="#" class="text-decoration-none fw-bold text-primary" data-bs-toggle="modal"
+                                            data-bs-target="#termsModal">Syarat & Ketentuan</a>
                                     </li>
                                     <li>
-                                        2. <a href="#" class="text-decoration-none" data-bs-toggle="modal"
-                                            data-bs-target="#refundModal">Kebijakan
-                                            Refund</a>
+                                        2. <a href="#" class="text-decoration-none fw-bold text-primary" data-bs-toggle="modal"
+                                            data-bs-target="#refundModal">Kebijakan Refund</a>
                                     </li>
                                 </ul>
                             </div>
@@ -116,7 +114,7 @@
 
                             <div class="d-grid">
                                 <!-- Tombol default disabled, akan aktif via JS saat dicentang -->
-                                <button type="submit" class="btn btn-brand btn-lg disabled" id="btnSubmit" disabled>
+                                <button type="submit" class="btn btn-brand btn-lg disabled w-100 py-3" id="btnSubmit" disabled style="min-height: 52px; font-weight: 700;">
                                     <i class="fas fa-shield-halved me-2"></i>
                                     Lanjutkan ke Pembayaran Aman
                                 </button>

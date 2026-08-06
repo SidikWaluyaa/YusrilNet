@@ -582,6 +582,38 @@
                 margin-top: 30px;
             }
         }
+
+        @media (max-width: 576px) {
+            #home {
+                padding-top: 100px;
+                padding-bottom: 45px;
+            }
+            .hero-title {
+                font-size: 1.75rem !important;
+                line-height: 1.25 !important;
+            }
+            .hero-desc {
+                font-size: 0.9rem !important;
+            }
+            .voucher-card {
+                padding: 18px 16px !important;
+            }
+            .voucher-price {
+                font-size: 1.85rem !important;
+            }
+            .floating-wa-btn {
+                bottom: 18px;
+                right: 18px;
+                width: 52px;
+                height: 52px;
+                font-size: 26px;
+            }
+            .wa-tooltip {
+                font-size: 0.75rem;
+                padding: 4px 10px;
+                right: 60px;
+            }
+        }
     </style>
 </head>
 
