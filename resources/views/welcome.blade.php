@@ -506,6 +506,67 @@
             font-size: 0.82rem;
         }
 
+        /* Floating WhatsApp Button */
+        .floating-wa-btn {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            width: 58px;
+            height: 58px;
+            background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+            color: white !important;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            box-shadow: 0 8px 22px rgba(37, 211, 102, 0.45);
+            z-index: 9999;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-decoration: none;
+            animation: waPulse 2.2s infinite;
+        }
+
+        .floating-wa-btn:hover {
+            transform: scale(1.12);
+            box-shadow: 0 12px 28px rgba(37, 211, 102, 0.6);
+        }
+
+        .wa-tooltip {
+            position: absolute;
+            right: 70px;
+            background: #1e293b;
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            white-space: nowrap;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+
+        .floating-wa-btn:hover .wa-tooltip {
+            opacity: 1;
+            visibility: visible;
+            right: 74px;
+        }
+
+        @keyframes waPulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 16px rgba(37, 211, 102, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(37, 211, 102, 0);
+            }
+        }
+
         /* Responsive Breakpoints */
         @media (max-width: 991.98px) {
             #home {
@@ -802,7 +863,7 @@
                     <div>
                         <a href="#" class="social-btn"><i class="fab fa-facebook-f"></i></a>
                         <a href="#" class="social-btn"><i class="fab fa-instagram"></i></a>
-                        <a href="#" class="social-btn"><i class="fab fa-whatsapp"></i></a>
+                        <a href="https://wa.me/62895343565099" target="_blank" class="social-btn"><i class="fab fa-whatsapp"></i></a>
                     </div>
                 </div>
 
@@ -830,8 +891,8 @@
                     <h5>Kontak</h5>
                     <ul class="list-unstyled small mb-0">
                         <li class="mb-2 d-flex"><i class="fas fa-map-marker-alt text-primary mt-1 me-2"></i> <span>Jl. Sriwijaya Gg. IX No.31, Bandung</span></li>
-                        <li class="mb-2 d-flex"><i class="fas fa-phone text-primary mt-1 me-2"></i> <span>+62 812-3456-7890</span></li>
-                        <li class="mb-2 d-flex"><i class="fas fa-envelope text-primary mt-1 me-2"></i> <span>info@yusrilnet.com</span></li>
+                        <li class="mb-2 d-flex"><i class="fas fa-phone text-primary mt-1 me-2"></i> <a href="https://wa.me/62895343565099" target="_blank" class="text-secondary text-decoration-none">0895343565099</a></li>
+                        <li class="mb-2 d-flex"><i class="fas fa-envelope text-primary mt-1 me-2"></i> <a href="mailto:voucheryusrilnet@gmail.com" class="text-secondary text-decoration-none">voucheryusrilnet@gmail.com</a></li>
                     </ul>
                 </div>
             </div>
@@ -848,6 +909,15 @@
             </div>
         </div>
     </footer>
+
+    <!-- Floating WhatsApp Button -->
+    <a href="https://wa.me/62895343565099?text=Halo%20Admin%20YusrilNet,%20saya%20butuh%20bantuan%20terkait%20voucher%20WiFi" 
+       target="_blank" 
+       class="floating-wa-btn" 
+       title="Chat CS Kami">
+        <span class="wa-tooltip">Chat CS Kami</span>
+        <i class="fab fa-whatsapp"></i>
+    </a>
 
     <!-- Modals -->
     <!-- Terms Modal -->
